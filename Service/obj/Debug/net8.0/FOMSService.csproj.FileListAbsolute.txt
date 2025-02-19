@@ -1,0 +1,15 @@
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.csproj.AssemblyReference.cache
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.AssemblyInfoInputs.cache
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.AssemblyInfo.cs
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.csproj.CoreCompileInputs.cache
+C:\Users\USER\source\repos\OJT\Service\bin\Debug\net8.0\FOMSService.deps.json
+C:\Users\USER\source\repos\OJT\Service\bin\Debug\net8.0\FOMSService.dll
+C:\Users\USER\source\repos\OJT\Service\bin\Debug\net8.0\FOMSService.pdb
+C:\Users\USER\source\repos\OJT\Service\bin\Debug\net8.0\FOMSDTO.dll
+C:\Users\USER\source\repos\OJT\Service\bin\Debug\net8.0\FOMSDTO.pdb
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSServ.884C5FC4.Up2Date
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.dll
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\refint\FOMSService.dll
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.pdb
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\ref\FOMSService.dll
