@@ -24,7 +24,7 @@ namespace FOMSOData.Controllers
             return grade;
         }
         [HttpGet("{userId}")]
-        public async Task<StudentGrade> GetByUserId(int userId)
+        public async Task<IEnumerable<StudentGrade>> GetGradeByUserId(int userId)
         {
             var grade = await studentGradeRepository.GetGradeByUserId(userId);
             return grade; 
@@ -73,7 +73,7 @@ namespace FOMSOData.Controllers
         public async Task<ActionResult> DeleteGrade(int userId, int curriculumId)
         {
             await studentGradeRepository.Delete(userId, curriculumId);
-            return NoContent();
+            return Ok("Delete Success");
         }
     }
 }

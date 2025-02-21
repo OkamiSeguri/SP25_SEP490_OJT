@@ -1,5 +1,10 @@
 ﻿@inject IHttpContextAccessor HttpContextAccessor
-
+@{
+    var userName = Context.Session.GetString("FullName");
+}
+@{
+    var userId = Context.Session.GetInt32("UserId");
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,44 +26,54 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        @* student *@
                         @if (HttpContextAccessor.HttpContext.Session.GetInt32("Role") == 0)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Grade" asp-route-userId="@((int?)Context.Session.GetInt32("UserId"))">Student Grade</a>
+                            </li>
+                            <li class="nav-item">
+                                <a style="margin-left:1600px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
                             </li>
                         }
+                        //staff
                         else if (HttpContextAccessor.HttpContext.Session.GetInt32("Role") == 1)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Curriculum" asp-action="Index">Curriculum Manage</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="StudentGrade" asp-action="Index">Student Grade</a>
                             </li>
+                            <li class="nav-item">
+                                <a style="margin-left:1600px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+                            </li>
                         }
+                        //enterprise
                         else if (HttpContextAccessor.HttpContext.Session.GetInt32("Role") == 2)
                         {
                             
                         }
+                        //admin
                         else if (HttpContextAccessor.HttpContext.Session.GetInt32("Role") == 3)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="StudentGrade" asp-action="Index">Student Grade</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Student Grade</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">User Manage</a>
+                            </li>
+                            <li class="nav-item">
+                                <a style="margin-left:1600px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
                             </li>
                         }
                         else

@@ -22,6 +22,7 @@ void ConfigureHttpClient(HttpClient client)
 }
 builder.Services.AddHttpClient<IUserservice, Userservice>(ConfigureHttpClient);
 builder.Services.AddHttpClient<IStudentGradeService, StudentGradeService>(ConfigureHttpClient);
+builder.Services.AddHttpClient<ICurriculumService, CurriculumService>(ConfigureHttpClient);
 
 builder.Services.AddAuthentication(options =>
 {

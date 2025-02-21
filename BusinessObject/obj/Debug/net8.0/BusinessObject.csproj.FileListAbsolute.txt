@@ -13,3 +13,4 @@ C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\refint\BusinessOb
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.pdb
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.genruntimeconfig.cache
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\ref\BusinessObject.dll
+C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.sourcelink.json

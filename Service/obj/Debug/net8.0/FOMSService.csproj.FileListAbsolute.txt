@@ -13,3 +13,4 @@ C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.dll
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\refint\FOMSService.dll
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.pdb
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\ref\FOMSService.dll
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.sourcelink.json

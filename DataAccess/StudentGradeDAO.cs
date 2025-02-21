@@ -14,11 +14,15 @@ namespace DataAccess
         {
             return await _context.StudentGrades.ToListAsync();
         }
-        public async Task<StudentGrade> GetGradeByUserId(int id)
+        public async Task<IEnumerable<StudentGrade>> GetGradeByUserId(int id)
         {
-            var grade = await _context.StudentGrades.FirstOrDefaultAsync(c => c.UserId == id);
-            if (grade == null) return null; return grade;
+            var grades = await _context.StudentGrades
+                .Where(c => c.UserId == id)
+                .ToListAsync();  
+
+            return grades; 
         }
+
         public async Task<StudentGrade> GetGrade(int UserId, int CurriculumId)
         {
             var grade = await _context.StudentGrades.FirstOrDefaultAsync(c => c.UserId == UserId && c.CurriculumId == CurriculumId);
