@@ -32,6 +32,12 @@ namespace FOMSMVC.Controllers
             var grade = await studentGradeService.GetGradeByUserId(userId);
             ViewBag.UserId = userId;
             return View(grade);
+        }       
+        public async Task<ActionResult> GradeByStudent(int userId)
+        {
+            var grade = await studentGradeService.GetGradeByUserId(userId);
+            ViewBag.UserId = userId;
+            return View(grade);
         }
 
         // GET: StudentGradeController/Details/5

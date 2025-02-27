@@ -26,8 +26,32 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\USER\source\repos\OJT\FOMSMVC
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/CohortCurriculum/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29ob3J0Q3VycmljdWx1bVxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/CohortCurriculum/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29ob3J0Q3VycmljdWx1bVxEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/CohortCurriculum/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29ob3J0Q3VycmljdWx1bVxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/CohortCurriculum/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29ob3J0Q3VycmljdWx1bVxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/CohortCurriculum/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29ob3J0Q3VycmljdWx1bVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Curriculum/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VycmljdWx1bVxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Curriculum/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VycmljdWx1bVxEZWxldGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Curriculum/Details.cshtml]
@@ -40,6 +64,30 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Curriculum/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VycmljdWx1bVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Enterprise/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50ZXJwcmlzZVxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Enterprise/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50ZXJwcmlzZVxEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Enterprise/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50ZXJwcmlzZVxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Enterprise/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50ZXJwcmlzZVxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Enterprise/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50ZXJwcmlzZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Enterprise/ListEnteprise.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRW50ZXJwcmlzZVxMaXN0RW50ZXByaXNlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/USER/source/repos/OJT/FOMSMVC/Views/Home/Index.cshtml]
@@ -74,8 +122,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEdyYWRlXEdyYWRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/StudentGrade/GradeByStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEdyYWRlXEdyYWRlQnlTdHVkZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/USER/source/repos/OJT/FOMSMVC/Views/StudentGrade/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudEdyYWRlXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/StudentProfile/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudFByb2ZpbGVcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/StudentProfile/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudFByb2ZpbGVcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/USER/source/repos/OJT/FOMSMVC/Views/StudentProfile/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU3R1ZGVudFByb2ZpbGVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/USER/source/repos/OJT/FOMSMVC/Views/User/Create.cshtml]

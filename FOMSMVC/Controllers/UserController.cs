@@ -219,7 +219,7 @@ namespace FOMSMVC.Controllers
 
                 HttpContext.Session.SetString("Email", user.Email);
                 HttpContext.Session.SetInt32("Role", user.Role);
-                HttpContext.Session.SetInt32("AccountId", user.UserId);
+                HttpContext.Session.SetInt32("UserId", user.UserId);
 
                 return RedirectToAction("Index", "Home");
             }

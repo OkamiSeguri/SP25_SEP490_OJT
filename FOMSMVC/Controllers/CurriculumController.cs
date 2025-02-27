@@ -78,18 +78,20 @@ namespace FOMSMVC.Controllers
         }
 
         // GET: CurriculumController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            var curriculum = await curriculumService.GetCurriculumById(id);
+            return View(curriculum);
         }
 
         // POST: CurriculumController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
             try
             {
+                await curriculumService.Delete(id);
                 return RedirectToAction(nameof(Index));
             }
             catch

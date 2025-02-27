@@ -22,20 +22,30 @@ namespace Repositories
         {
             return await StudentGradeDAO.Instance.GetGrade(UserId, CuriculumId);
         }
+        public async Task UpdateStudentCredits(int UserId)
+        {
+            await StudentGradeDAO.Instance.UpdateStudentCredits(UserId);
+        }
+
 
         public async Task Create(StudentGrade studentGrade)
         {
             await StudentGradeDAO.Instance.Create(studentGrade);
+            await StudentGradeDAO.Instance.UpdateStudentCredits(studentGrade.UserId);
+
         }
 
         public async Task Update(StudentGrade studentGrade)
         {
             await StudentGradeDAO.Instance.Update(studentGrade);
+            await UpdateStudentCredits(studentGrade.UserId);
         }
 
         public async Task Delete(int UserId, int CurriculumId)
         {
             await StudentGradeDAO.Instance.Delete(UserId, CurriculumId);
+            await UpdateStudentCredits(UserId);
+
         }
     }
 }

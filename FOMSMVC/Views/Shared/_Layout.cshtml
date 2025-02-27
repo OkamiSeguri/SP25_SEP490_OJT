@@ -4,7 +4,9 @@
 }
 @{
     var userId = Context.Session.GetInt32("UserId");
+    Console.WriteLine($"UserId from session: {userId}");
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,9 +36,12 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Grade" asp-route-userId="@((int?)Context.Session.GetInt32("UserId"))">Student Grade</a>
+                            </li>             
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Enterprise" asp-action="ListEnteprise"> List Enterprise</a>
                             </li>
                             <li class="nav-item">
-                                <a style="margin-left:1600px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+                                <a style="margin-left:1200px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
                             </li>
                         }
                         //staff
@@ -47,12 +52,18 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Curriculum" asp-action="Index">Curriculum Manage</a>
+                            </li>                  
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="CohortCurriculum" asp-action="Index">Cohort Curriculum Manage</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="StudentGrade" asp-action="Index">Student Grade</a>
+                            </li>                         
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="StudentProfile" asp-action="Index">Student Profile</a>
                             </li>
                             <li class="nav-item">
-                                <a style="margin-left:1600px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+                                <a style="margin-left:1200px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
                             </li>
                         }
                         //enterprise
@@ -71,9 +82,12 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">User Manage</a>
+                            </li>                      
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Enterprise" asp-action="Index">Enterprise Manage</a>
                             </li>
                             <li class="nav-item">
-                                <a style="margin-left:1600px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+                                <a style="margin-left:1200px" class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
                             </li>
                         }
                         else
