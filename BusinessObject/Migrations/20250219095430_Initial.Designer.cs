@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250226113230_Initial")]
+    [Migration("20250219095430_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -91,13 +91,7 @@ namespace BusinessObject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("EnterpriseId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Enterprises");
                 });
@@ -238,9 +232,9 @@ namespace BusinessObject.Migrations
                     b.Property<decimal>("Grade")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("IsPassed")
+                    b.Property<bool>("IsPassed")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("int")
+                        .HasColumnType("bit")
                         .HasComputedColumnSql("CASE WHEN Grade >= 5.0 THEN 1 ELSE 0 END");
 
                     b.Property<int>("Semester")
@@ -256,10 +250,7 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.StudentProfile", b =>
                 {
                     b.Property<int>("StudentId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentId"));
 
                     b.Property<string>("Cohort")
                         .IsRequired()
@@ -275,13 +266,7 @@ namespace BusinessObject.Migrations
                     b.Property<int>("TotalCredits")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("StudentId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("StudentProfiles");
                 });
@@ -323,17 +308,6 @@ namespace BusinessObject.Migrations
                         .IsRequired();
 
                     b.Navigation("Curriculum");
-                });
-
-            modelBuilder.Entity("BusinessObject.Enterprise", b =>
-                {
-                    b.HasOne("BusinessObject.User", "User")
-                        .WithOne("Enterprise")
-                        .HasForeignKey("BusinessObject.Enterprise", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BusinessObject.OJTFeedback", b =>
@@ -418,9 +392,9 @@ namespace BusinessObject.Migrations
             modelBuilder.Entity("BusinessObject.StudentProfile", b =>
                 {
                     b.HasOne("BusinessObject.User", "User")
-                        .WithOne("StudentProfile")
-                        .HasForeignKey("BusinessObject.StudentProfile", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .WithOne()
+                        .HasForeignKey("BusinessObject.StudentProfile", "StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -445,11 +419,7 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.User", b =>
                 {
-                    b.Navigation("Enterprise");
-
                     b.Navigation("OJTRegistration");
-
-                    b.Navigation("StudentProfile");
                 });
 #pragma warning restore 612, 618
         }

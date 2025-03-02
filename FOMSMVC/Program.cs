@@ -22,10 +22,6 @@ void ConfigureHttpClient(HttpClient client)
 }
 builder.Services.AddHttpClient<IUserservice, Userservice>(ConfigureHttpClient);
 builder.Services.AddHttpClient<IStudentGradeService, StudentGradeService>(ConfigureHttpClient);
-builder.Services.AddHttpClient<ICurriculumService, CurriculumService>(ConfigureHttpClient);
-builder.Services.AddHttpClient<ICohortCurriculumService, CohortCurriculumService>(ConfigureHttpClient);
-builder.Services.AddHttpClient<IEnterpriseService, EnterpriseService>(ConfigureHttpClient);
-builder.Services.AddHttpClient<IStudentProfileService, StudentProfileService>(ConfigureHttpClient);
 
 builder.Services.AddAuthentication(options =>
 {

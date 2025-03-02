@@ -15,12 +15,10 @@ namespace FOMSMVC.Controllers
     public class UserController : Controller
     {
         private readonly IUserservice userservice;
-        private readonly IStudentGradeService studentGradeService;
         private readonly ApplicationDbContext _context;
 
-        public UserController(IUserservice userservice, ApplicationDbContext context, IStudentGradeService studentGradeService)
+        public UserController(IUserservice userservice, ApplicationDbContext context)
         {
-            this.studentGradeService = studentGradeService;
             this._context = context;
             this.userservice = userservice;
         }
@@ -29,15 +27,9 @@ namespace FOMSMVC.Controllers
         public async Task<ActionResult>  Index()
         {
             var user = await userservice.GetUserAll();
-            var filteredUsers = user.Where(u => u.Role != 3).ToList();
-            return View(filteredUsers);
+            return View(user);
         }
-        public async Task<ActionResult> Grade(int userId)
-        {
-            var grade = await studentGradeService.GetGradeByUserId(userId);
-            ViewBag.UserId = userId;
-            return View(grade);
-        }
+
         // GET: UserController/Details/5
         public async Task<ActionResult> Details(int id)
         {
@@ -95,21 +87,18 @@ namespace FOMSMVC.Controllers
         }
 
         // GET: UserController/Delete/5
-        public async Task<ActionResult> Delete(int id)
+        public ActionResult Delete(int id)
         {
-           var user =  await userservice.GetUserById(id);
-
-            return View(user);
+            return View();
         }
 
         // POST: UserController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, IFormCollection collection)
         {
             try
             {
-                await userservice.Delete(id);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -134,7 +123,7 @@ namespace FOMSMVC.Controllers
                 return View();
             }
 
-            HttpContext.Session.SetInt32("UserId", user.UserId);
+            HttpContext.Session.SetString("UserId", user.UserId.ToString());
             HttpContext.Session.SetString("FullName", user.FullName);
             HttpContext.Session.SetInt32("Role", user.Role);
             return RedirectToAction("Index", "Home");
@@ -219,7 +208,7 @@ namespace FOMSMVC.Controllers
 
                 HttpContext.Session.SetString("Email", user.Email);
                 HttpContext.Session.SetInt32("Role", user.Role);
-                HttpContext.Session.SetInt32("UserId", user.UserId);
+                HttpContext.Session.SetInt32("AccountId", user.UserId);
 
                 return RedirectToAction("Index", "Home");
             }

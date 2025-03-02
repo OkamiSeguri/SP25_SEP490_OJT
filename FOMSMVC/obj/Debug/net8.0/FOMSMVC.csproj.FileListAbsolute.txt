@@ -278,4 +278,3 @@ C:\Users\USER\source\repos\OJT\FOMSMVC\bin\Debug\net8.0\FOMSService.dll
 C:\Users\USER\source\repos\OJT\FOMSMVC\bin\Debug\net8.0\FOMSService.pdb
 C:\Users\USER\source\repos\OJT\FOMSMVC\bin\Debug\net8.0\FOMSDTO.pdb
 C:\Users\USER\source\repos\OJT\FOMSMVC\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.Google.dll
-C:\Users\USER\source\repos\OJT\FOMSMVC\obj\Debug\net8.0\FOMSMVC.sourcelink.json

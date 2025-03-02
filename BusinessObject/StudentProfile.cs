@@ -12,11 +12,10 @@ namespace BusinessObject
         [Key]
 
         public int StudentId { get; set; }
-        public string? Cohort { get; set; }
-        public string? Major { get; set; }
-        public int? TotalCredits { get; set; }
-        public int? DebtCredits { get; set; }
-        public int UserId { get; set; }
-        public User? User { get; set; }
+        public string Cohort { get; set; }
+        public string Major { get; set; }
+        public int TotalCredits { get; set; }
+        public int DebtCredits { get; set; }
+        public User User { get; set; }
     }
 }

@@ -1,13 +1,14 @@
-﻿@model IEnumerable<FOMSDTO.UserDTO>
+﻿@model IEnumerable<FOMSDTO.StudentGradeDTO>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Student List</h1>
+<h1>Index</h1>
 
-
-
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 <table class="table">
     <thead>
         <tr>
@@ -15,12 +16,17 @@
                 @Html.DisplayNameFor(model => model.UserId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FullName)
+                @Html.DisplayNameFor(model => model.CurriculumId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.Semester)
             </th>
-
+            <th>
+                @Html.DisplayNameFor(model => model.Grade)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsPassed)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -32,14 +38,22 @@
                     @Html.DisplayFor(modelItem => item.UserId)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FullName)
+                    @Html.DisplayFor(modelItem => item.CurriculumId)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Email)
+                    @Html.DisplayFor(modelItem => item.Semester)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Grade)
+                </td>
+                <td>
+                    @(item.IsPassed == 1 ? "Pass" : "Not Pass")
                 </td>
 
                 <td>
-                    @Html.ActionLink("Grade", "Grade", new { userId = item.UserId })
+                    @Html.ActionLink("Edit", "Edit", new { userId = item.UserId, curriculumId = item.CurriculumId }) |
+                    @Html.ActionLink("Details", "Details", new { userId = item.UserId, curriculumId = item.CurriculumId }) |
+                    @Html.ActionLink("Delete", "Delete", new { userId = item.UserId, curriculumId = item.CurriculumId })
                 </td>
             </tr>
         }
