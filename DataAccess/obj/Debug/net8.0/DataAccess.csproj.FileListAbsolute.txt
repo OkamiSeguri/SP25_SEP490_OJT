@@ -14,4 +14,3 @@ C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.dll
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\refint\DataAccess.dll
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.pdb
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\ref\DataAccess.dll
-C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.sourcelink.json

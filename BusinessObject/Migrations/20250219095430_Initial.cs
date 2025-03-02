@@ -27,6 +27,22 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Enterprises",
+                columns: table => new
+                {
+                    EnterpriseId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Industry = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContactEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContactPhone = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Enterprises", x => x.EnterpriseId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -62,25 +78,26 @@ namespace BusinessObject.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Enterprises",
+                name: "OJTPrograms",
                 columns: table => new
                 {
-                    EnterpriseId = table.Column<int>(type: "int", nullable: false)
+                    ProgramId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Industry = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactPhone = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    EnterpriseId = table.Column<int>(type: "int", nullable: false),
+                    ProgramName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Enterprises", x => x.EnterpriseId);
+                    table.PrimaryKey("PK_OJTPrograms", x => x.ProgramId);
                     table.ForeignKey(
-                        name: "FK_Enterprises_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
+                        name: "FK_OJTPrograms_Enterprises_EnterpriseId",
+                        column: x => x.EnterpriseId,
+                        principalTable: "Enterprises",
+                        principalColumn: "EnterpriseId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -92,7 +109,7 @@ namespace BusinessObject.Migrations
                     CurriculumId = table.Column<int>(type: "int", nullable: false),
                     Semester = table.Column<int>(type: "int", nullable: false),
                     Grade = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    IsPassed = table.Column<int>(type: "int", nullable: false, computedColumnSql: "CASE WHEN Grade >= 5.0 THEN 1 ELSE 0 END")
+                    IsPassed = table.Column<bool>(type: "bit", nullable: false, computedColumnSql: "CASE WHEN Grade >= 5.0 THEN 1 ELSE 0 END")
                 },
                 constraints: table =>
                 {
@@ -115,45 +132,20 @@ namespace BusinessObject.Migrations
                 name: "StudentProfiles",
                 columns: table => new
                 {
-                    StudentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
                     Cohort = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Major = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TotalCredits = table.Column<int>(type: "int", nullable: false),
-                    DebtCredits = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    DebtCredits = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_StudentProfiles", x => x.StudentId);
                     table.ForeignKey(
-                        name: "FK_StudentProfiles_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_StudentProfiles_Users_StudentId",
+                        column: x => x.StudentId,
                         principalTable: "Users",
-                        principalColumn: "UserId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OJTPrograms",
-                columns: table => new
-                {
-                    ProgramId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EnterpriseId = table.Column<int>(type: "int", nullable: false),
-                    ProgramName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OJTPrograms", x => x.ProgramId);
-                    table.ForeignKey(
-                        name: "FK_OJTPrograms_Enterprises_EnterpriseId",
-                        column: x => x.EnterpriseId,
-                        principalTable: "Enterprises",
-                        principalColumn: "EnterpriseId",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -239,12 +231,6 @@ namespace BusinessObject.Migrations
                 column: "CurriculumId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Enterprises_UserId",
-                table: "Enterprises",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OJTFeedbacks_OJTId",
                 table: "OJTFeedbacks",
                 column: "OJTId");
@@ -278,12 +264,6 @@ namespace BusinessObject.Migrations
                 name: "IX_StudentGrades_CurriculumId",
                 table: "StudentGrades",
                 column: "CurriculumId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StudentProfiles_UserId",
-                table: "StudentProfiles",
-                column: "UserId",
-                unique: true);
         }
 
         /// <inheritdoc />
@@ -314,10 +294,10 @@ namespace BusinessObject.Migrations
                 name: "OJTPrograms");
 
             migrationBuilder.DropTable(
-                name: "Enterprises");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Enterprises");
         }
     }
 }

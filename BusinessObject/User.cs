@@ -15,8 +15,6 @@ namespace BusinessObject
         public string Password { get; set; }
         public int Role { get; set; }
         public ICollection<OJTRegistration>? OJTRegistration { get; set; }
-        public virtual Enterprise? Enterprise { get; set; }
-        public StudentProfile? StudentProfile { get; set; }
 
 
     }

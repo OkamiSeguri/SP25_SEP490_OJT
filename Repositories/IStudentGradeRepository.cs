@@ -10,9 +10,8 @@ namespace Repositories
     public interface IStudentGradeRepository
     {
         Task<IEnumerable<StudentGrade>> GetGradesAll();
-        Task<IEnumerable<StudentGrade>> GetGradeByUserId(int id);
+        Task<StudentGrade> GetGradeByUserId(int id);
         Task<StudentGrade> GetGrade(int UserId, int CurriculumId);
-        Task UpdateStudentCredits(int UserId);
         Task Create(StudentGrade studentGrade);
         Task Update(StudentGrade studentGrade);
         Task Delete(int UserId, int CurriculumId);

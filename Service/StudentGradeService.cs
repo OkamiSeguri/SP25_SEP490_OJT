@@ -14,8 +14,8 @@ namespace FOMSService
 
         public async Task<IEnumerable<StudentGradeDTO>> GetGradesAll()
             => await _httpClient.GetFromJsonAsync<IEnumerable<StudentGradeDTO>>("StudentGrade");
-        public async Task<IEnumerable<StudentGradeDTO>> GetGradeByUserId(int id)
-            => await _httpClient.GetFromJsonAsync<IEnumerable<StudentGradeDTO>>($"StudentGrade/{id}");
+        public async Task<StudentGradeDTO> GetUserById(int id)
+            => await _httpClient.GetFromJsonAsync<StudentGradeDTO>($"StudentGrade/{id}");
 
         public async Task<StudentGradeDTO> GetGrade(int userId, int curriculumId)
             => await _httpClient.GetFromJsonAsync<StudentGradeDTO>($"StudentGrade/{userId}/{curriculumId}");

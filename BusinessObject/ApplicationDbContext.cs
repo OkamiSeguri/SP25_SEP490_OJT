@@ -26,12 +26,11 @@ namespace BusinessObject
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<StudentProfile>()
-        .HasOne(s => s.User)
-        .WithOne(u => u.StudentProfile)
-        .HasForeignKey<StudentProfile>(s => s.UserId)
-        .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<StudentProfile>()
+                .HasOne(sp => sp.User)
+                .WithOne()
+                .HasForeignKey<StudentProfile>(sp => sp.StudentId);
 
             modelBuilder.Entity<CohortCurriculum>()
                 .HasKey(cc => new { cc.Cohort, cc.CurriculumId });

@@ -11,6 +11,6 @@ namespace BusinessObject
         public string Cohort { get; set; }
         public int CurriculumId { get; set; }
         public int Semester { get; set; }
-        public Curriculum? Curriculum { get; set; }
+        public Curriculum Curriculum { get; set; }
     }
 }

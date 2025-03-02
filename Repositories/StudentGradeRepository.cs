@@ -14,7 +14,7 @@ namespace Repositories
         {
             return await StudentGradeDAO.Instance.GetGradesAll();
         }
-        public async Task<IEnumerable<StudentGrade>> GetGradeByUserId(int id)
+        public async Task<StudentGrade> GetGradeByUserId(int id)
         {
             return await StudentGradeDAO.Instance.GetGradeByUserId(id);
         }
@@ -22,30 +22,20 @@ namespace Repositories
         {
             return await StudentGradeDAO.Instance.GetGrade(UserId, CuriculumId);
         }
-        public async Task UpdateStudentCredits(int UserId)
-        {
-            await StudentGradeDAO.Instance.UpdateStudentCredits(UserId);
-        }
-
 
         public async Task Create(StudentGrade studentGrade)
         {
             await StudentGradeDAO.Instance.Create(studentGrade);
-            await StudentGradeDAO.Instance.UpdateStudentCredits(studentGrade.UserId);
-
         }
 
         public async Task Update(StudentGrade studentGrade)
         {
             await StudentGradeDAO.Instance.Update(studentGrade);
-            await UpdateStudentCredits(studentGrade.UserId);
         }
 
-        public async Task Delete(int UserId, int CurriculumId)
+        public async Task Delete(int OrderId, int ProductId)
         {
-            await StudentGradeDAO.Instance.Delete(UserId, CurriculumId);
-            await UpdateStudentCredits(UserId);
-
+            await StudentGradeDAO.Instance.Delete(OrderId, ProductId);
         }
     }
 }
