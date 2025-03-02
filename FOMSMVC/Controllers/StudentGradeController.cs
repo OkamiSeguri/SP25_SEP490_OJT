@@ -1,44 +1,75 @@
-﻿using FOMSService;
+﻿using FOMSDTO;
+using FOMSService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FOMSMVC.Controllers
 {
     public class StudentGradeController : Controller
     {
         private readonly IStudentGradeService studentGradeService;
-        public StudentGradeController(IStudentGradeService studentGradeService)
+        private readonly IUserservice userservice;
+        private readonly ICurriculumService curriculumService;
+
+        public StudentGradeController(IStudentGradeService studentGradeService, IUserservice userservice, ICurriculumService curriculumService)
         {
             this.studentGradeService = studentGradeService;
+            this.userservice = userservice;
+            this.curriculumService = curriculumService;
         }
 
         // GET: StudentGradeController
         public async Task<ActionResult> Index()
         {
-            var grade = await studentGradeService.GetGradesAll();
+            var user = await userservice.GetUserAll();
+            var filteredUsers = user.Where(u => u.Role == 0).ToList();
+            return View(filteredUsers);
+        }
+
+        public async Task<ActionResult> Grade(int userId)
+        {
+            var grade = await studentGradeService.GetGradeByUserId(userId);
+            ViewBag.UserId = userId;
+            return View(grade);
+        }       
+        public async Task<ActionResult> GradeByStudent(int userId)
+        {
+            var grade = await studentGradeService.GetGradeByUserId(userId);
+            ViewBag.UserId = userId;
             return View(grade);
         }
 
         // GET: StudentGradeController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int userId, int curriculumId)
         {
-            return View();
+            var grade = await studentGradeService.GetGrade(userId,curriculumId);
+            if (grade == null)
+            {
+                return NotFound();
+            }
+            return View(grade);
         }
 
         // GET: StudentGradeController/Create
-        public ActionResult Create()
+        public async Task<ActionResult> Create(int id)
         {
-            return View();
+            var curriculums = await curriculumService.GetCurriculumAll(); 
+            ViewBag.CurriculumList = new SelectList(curriculums, "CurriculumId", "SubjectCode");
+
+            var model = new StudentGradeDTO { UserId = id }; 
+            return View(model);
         }
 
         // POST: StudentGradeController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create(StudentGradeDTO studentGradeDTO)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                await studentGradeService.Create(studentGradeDTO);
+                return RedirectToAction("Grade", new { userId = studentGradeDTO.UserId });
             }
             catch
             {
@@ -68,18 +99,20 @@ namespace FOMSMVC.Controllers
         }
 
         // GET: StudentGradeController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int userId, int curriculumId)
         {
-            return View();
+            var grade = await studentGradeService.GetGrade(userId, curriculumId);
+            return View(grade);
         }
 
         // POST: StudentGradeController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int userId,int curriculumId, IFormCollection collection)
         {
             try
             {
+                await studentGradeService.Delete(userId, curriculumId);
                 return RedirectToAction(nameof(Index));
             }
             catch

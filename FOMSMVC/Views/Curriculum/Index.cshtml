@@ -1,0 +1,53 @@
+﻿@model IEnumerable<FOMSDTO.CurriculumDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CurriculumId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubjectCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubjectName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Credits)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CurriculumId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubjectCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubjectName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Credits)
+            </td>
+            <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.CurriculumId }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.CurriculumId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.CurriculumId })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
