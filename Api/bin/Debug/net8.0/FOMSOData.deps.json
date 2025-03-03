@@ -2390,7 +2390,10 @@
           "Microsoft.Extensions.Configuration.Json": "9.0.2"
         },
         "runtime": {
-          "BusinessObject.dll": {}
+          "BusinessObject.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "DataAccess/1.0.0": {
@@ -2398,12 +2401,18 @@
           "BusinessObject": "1.0.0"
         },
         "runtime": {
-          "DataAccess.dll": {}
+          "DataAccess.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "FOMSDTO/1.0.0": {
         "runtime": {
-          "FOMSDTO.dll": {}
+          "FOMSDTO.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Repositories/1.0.0": {
@@ -2411,7 +2420,10 @@
           "DataAccess": "1.0.0"
         },
         "runtime": {
-          "Repositories.dll": {}
+          "Repositories.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

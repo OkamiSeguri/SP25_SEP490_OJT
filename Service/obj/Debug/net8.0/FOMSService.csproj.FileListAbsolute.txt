@@ -13,3 +13,23 @@ C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.dll
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\refint\FOMSService.dll
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.pdb
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\ref\FOMSService.dll
+<<<<<<< Updated upstream
+=======
+C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.sourcelink.json
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSService.deps.json
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSService.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSService.pdb
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSDTO.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSDTO.pdb
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.csproj.AssemblyReference.cache
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.GeneratedMSBuildEditorConfig.editorconfig
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.AssemblyInfoInputs.cache
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.AssemblyInfo.cs
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.csproj.CoreCompileInputs.cache
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.sourcelink.json
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSServ.884C5FC4.Up2Date
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\refint\FOMSService.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.pdb
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Service\obj\Debug\net8.0\ref\FOMSService.dll
+>>>>>>> Stashed changes

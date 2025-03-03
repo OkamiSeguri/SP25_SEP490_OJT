@@ -2038,12 +2038,18 @@
           "Microsoft.Extensions.Configuration.Json": "9.0.2"
         },
         "runtime": {
-          "BusinessObject.dll": {}
+          "BusinessObject.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "FOMSDTO/1.0.0": {
         "runtime": {
-          "FOMSDTO.dll": {}
+          "FOMSDTO.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "FOMSService/1.0.0": {
@@ -2051,7 +2057,10 @@
           "FOMSDTO": "1.0.0"
         },
         "runtime": {
-          "FOMSService.dll": {}
+          "FOMSService.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

@@ -21,8 +21,6 @@ namespace BusinessObject
         public OJTProgram OJTProgram { get; set; }
         public Enterprise Enterprise { get; set; }
         public User User { get; set; }
-
-
     }
 
 }

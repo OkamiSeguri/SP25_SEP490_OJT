@@ -16,3 +16,26 @@ C:\Users\USER\source\repos\OJT\Repositories\obj\Debug\net8.0\Repositories.dll
 C:\Users\USER\source\repos\OJT\Repositories\obj\Debug\net8.0\refint\Repositories.dll
 C:\Users\USER\source\repos\OJT\Repositories\obj\Debug\net8.0\Repositories.pdb
 C:\Users\USER\source\repos\OJT\Repositories\obj\Debug\net8.0\ref\Repositories.dll
+<<<<<<< Updated upstream
+=======
+C:\Users\USER\source\repos\OJT\Repositories\obj\Debug\net8.0\Repositories.sourcelink.json
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\bin\Debug\net8.0\appsettings.json
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\bin\Debug\net8.0\Repositories.deps.json
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\bin\Debug\net8.0\Repositories.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\bin\Debug\net8.0\Repositories.pdb
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\bin\Debug\net8.0\BusinessObject.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\bin\Debug\net8.0\DataAccess.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\bin\Debug\net8.0\DataAccess.pdb
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\bin\Debug\net8.0\BusinessObject.pdb
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Repositories.csproj.AssemblyReference.cache
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Repositories.GeneratedMSBuildEditorConfig.editorconfig
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Repositories.AssemblyInfoInputs.cache
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Repositories.AssemblyInfo.cs
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Repositories.csproj.CoreCompileInputs.cache
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Repositories.sourcelink.json
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Reposito.787EC4B2.Up2Date
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Repositories.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\refint\Repositories.dll
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\Repositories.pdb
+D:\Codes\OJT_Codes\SP25_SEP490_OJT\Repositories\obj\Debug\net8.0\ref\Repositories.dll
+>>>>>>> Stashed changes

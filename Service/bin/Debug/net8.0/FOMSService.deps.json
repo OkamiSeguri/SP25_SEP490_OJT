@@ -16,7 +16,10 @@
       },
       "FOMSDTO/1.0.0": {
         "runtime": {
-          "FOMSDTO.dll": {}
+          "FOMSDTO.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

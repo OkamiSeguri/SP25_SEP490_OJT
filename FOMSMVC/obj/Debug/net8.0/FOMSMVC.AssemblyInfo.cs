@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FOMSMVC")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ca676c79ddbb201e35fec71159bd138baf52a159")]
 [assembly: System.Reflection.AssemblyProductAttribute("FOMSMVC")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FOMSMVC")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
