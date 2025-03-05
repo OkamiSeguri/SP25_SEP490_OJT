@@ -14,3 +14,19 @@ C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\refint\FOMSService.dll
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.pdb
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\ref\FOMSService.dll
 C:\Users\USER\source\repos\OJT\Service\obj\Debug\net8.0\FOMSService.sourcelink.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSService.deps.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSService.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSService.pdb
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSDTO.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\bin\Debug\net8.0\FOMSDTO.pdb
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.csproj.AssemblyReference.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.GeneratedMSBuildEditorConfig.editorconfig
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.AssemblyInfoInputs.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.AssemblyInfo.cs
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.csproj.CoreCompileInputs.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.sourcelink.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSServ.884C5FC4.Up2Date
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\refint\FOMSService.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\FOMSService.pdb
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\Service\obj\Debug\net8.0\ref\FOMSService.dll

@@ -14,3 +14,19 @@ C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.pd
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.genruntimeconfig.cache
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\ref\BusinessObject.dll
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.sourcelink.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\bin\Debug\net8.0\appsettings.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\bin\Debug\net8.0\BusinessObject.deps.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\bin\Debug\net8.0\BusinessObject.runtimeconfig.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\bin\Debug\net8.0\BusinessObject.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\bin\Debug\net8.0\BusinessObject.pdb
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.csproj.AssemblyReference.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.GeneratedMSBuildEditorConfig.editorconfig
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.AssemblyInfoInputs.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.AssemblyInfo.cs
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.csproj.CoreCompileInputs.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.sourcelink.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\refint\BusinessObject.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.pdb
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.genruntimeconfig.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\BusinessObject\obj\Debug\net8.0\ref\BusinessObject.dll

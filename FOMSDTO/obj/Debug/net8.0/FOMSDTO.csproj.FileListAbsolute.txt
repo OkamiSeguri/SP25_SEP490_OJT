@@ -10,3 +10,15 @@ C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\refint\FOMSDTO.dll
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.pdb
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\ref\FOMSDTO.dll
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.sourcelink.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\bin\Debug\net8.0\FOMSDTO.deps.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\bin\Debug\net8.0\FOMSDTO.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\bin\Debug\net8.0\FOMSDTO.pdb
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.GeneratedMSBuildEditorConfig.editorconfig
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.AssemblyInfoInputs.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.AssemblyInfo.cs
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.csproj.CoreCompileInputs.cache
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.sourcelink.json
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\refint\FOMSDTO.dll
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.pdb
+E:\FPT\Đồ Án Tốt Nghiệp\Codes\backend_1\SP25_SEP490_OJT\FOMSDTO\obj\Debug\net8.0\ref\FOMSDTO.dll
