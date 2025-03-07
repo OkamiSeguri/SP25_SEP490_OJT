@@ -15,9 +15,9 @@ namespace DataAccess
         {
             return await _context.CohortCurriculums.ToListAsync();
         }
-        public async Task<CohortCurriculum> GetCohortCurriculumByCohort(string cohort)
+        public async Task<CohortCurriculum> GetCohortCurriculum(string cohort, int curriculumId)
         {
-            var cohorts = await _context.CohortCurriculums.FirstOrDefaultAsync(c => c.Cohort == cohort);
+            var cohorts = await _context.CohortCurriculums.FirstOrDefaultAsync(c => c.Cohort == cohort && c.CurriculumId == curriculumId);
             if (cohorts == null) return null; return cohorts;
         }
         public async Task Create(CohortCurriculum cohort)
@@ -27,21 +27,27 @@ namespace DataAccess
         }
         public async Task Update(CohortCurriculum cohort)
         {
-            var existingItem = await GetCohortCurriculumByCohort(cohort.Cohort);
+            var existingItem = await GetCohortCurriculum(cohort.Cohort,cohort.CurriculumId);
             if (existingItem != null)
             {
                 _context.Entry(existingItem).CurrentValues.SetValues(cohort);
             }
             await _context.SaveChangesAsync();
         }
-        public async Task Delete(string cohort)
+        public async Task Delete(string cohort, int curriculumId)
         {
-            var cohorts = await GetCohortCurriculumByCohort(cohort);
+            var cohorts = await GetCohortCurriculum(cohort,curriculumId);
             if (cohorts != null)
             {
                 _context.CohortCurriculums.Remove(cohorts);
                 await _context.SaveChangesAsync();
             }
         }
+        public int GetExpectedSemester(string cohort,int curriculumId)
+        {
+            var cohortCurriculum = _context.CohortCurriculums.FirstOrDefault(c => c.Cohort == cohort);
+            return cohortCurriculum?.Semester ?? 6;
+        }
+
     }
 }

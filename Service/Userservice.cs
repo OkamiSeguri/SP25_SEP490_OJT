@@ -10,8 +10,8 @@ public class Userservice : IUserservice
         _httpClient = httpClient;
     }
 
-    public async Task<IEnumerable<UserDTO>> GetUserAll()
-        => await _httpClient.GetFromJsonAsync<IEnumerable<UserDTO>>("User");
+    public async Task<List<UserDTO>> GetUserAll()
+        => await _httpClient.GetFromJsonAsync<List<UserDTO>>("User");
 
     public async Task<UserDTO> GetUserById(int id)
         => await _httpClient.GetFromJsonAsync<UserDTO>($"User/{id}");

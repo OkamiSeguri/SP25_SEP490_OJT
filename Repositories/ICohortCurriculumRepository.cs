@@ -10,10 +10,10 @@ namespace Repositories
     public interface ICohortCurriculumRepository
     {
         Task<IEnumerable<CohortCurriculum>> GetCohortCurriculumAll();
-        Task<CohortCurriculum> GetCohortCurriculumByCohort(string cohort);
+        Task<CohortCurriculum> GetCohortCurriculum(string cohort, int curriculumId);
         Task Create(CohortCurriculum cohortCurriculum);
         Task Update(CohortCurriculum cohortCurriculum);
-        Task Delete(string cohort);
+        Task Delete(string cohort, int curriculumId);
     }
 }
 

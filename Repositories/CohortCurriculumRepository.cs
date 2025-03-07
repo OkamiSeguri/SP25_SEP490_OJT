@@ -16,9 +16,9 @@ namespace Repositories
             return await CohortCurriculumDAO.Instance.GetCohortCurriculumAll();
         }
 
-        public async Task<CohortCurriculum> GetCohortCurriculumByCohort(string cohort)
+        public async Task<CohortCurriculum> GetCohortCurriculum(string cohort, int curriculumId)
         {
-            return await CohortCurriculumDAO.Instance.GetCohortCurriculumByCohort(cohort);
+            return await CohortCurriculumDAO.Instance.GetCohortCurriculum(cohort, curriculumId);
         }
 
         public async Task Create(CohortCurriculum cohortCurriculum)
@@ -29,9 +29,10 @@ namespace Repositories
         {
             await CohortCurriculumDAO.Instance.Update(cohortCurriculum);
         }
-        public async Task Delete(string cohort)
+        public async Task Delete(string cohort,int curriculumId)
         {
-            await CohortCurriculumDAO.Instance.Delete(cohort);
+            await CohortCurriculumDAO.Instance.Delete(cohort,curriculumId);
         }
+
     }
 }

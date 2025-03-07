@@ -1,8 +1,9 @@
 ﻿using BusinessObject;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Services;
+using System.Security.Claims;
 
 namespace FOMSOData.Controllers
 {
@@ -11,79 +12,229 @@ namespace FOMSOData.Controllers
     public class StudentProfileController : ControllerBase
     {
         private readonly IStudentProfileRepository studentProfileRepository;
-        public StudentProfileController()
+        private readonly JWTService jwtService;
+
+        public StudentProfileController(JWTService jwtService)
         {
             studentProfileRepository = new StudentProfileRepository();
+            this.jwtService = jwtService;
+
         }
-        // GET: api/<StudentProfileController>
+        private bool IsAuthenticated()
+        {
+            return HttpContext.User.Identity != null && HttpContext.User.Identity.IsAuthenticated;
+        }
+
+        private bool IsAuthorized()
+        {
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
+
+            return roleClaim != null && roleClaim.Value == "1";
+        }
+
         [HttpGet]
-        public async Task<IEnumerable<StudentProfile>> Get()
+        public async Task<ActionResult<IEnumerable<StudentProfile>>> Get()
         {
-            var student = await studentProfileRepository.GetStudentProfileAll();
-            return student;
+
+            if (!IsAuthenticated())
+            {
+                return StatusCode(401, new { code = 401, detail = "Authentication required" });
+            }
+
+            if (!IsAuthorized())
+            {
+                return StatusCode(403, new { code = 403, detail = "You do not have permission" });
+            }
+
+            try
+            {
+
+                var students = await studentProfileRepository.GetStudentProfileAll();
+                if (students == null || !students.Any())
+                {
+                    return NotFound(new { code = 404, detail = "No student profiles found" });
+                }
+                return Ok(new
+                {
+                    results = students.Select(u => new
+                    {
+                        userId = u.UserId,
+                        studentId = u.StudentId,
+                        cohortCurriculumId = u.CohortCurriculumId,
+                        totalCredits = u.TotalCredits,
+                        debtCredits = u.DebtCredits,
+                    }),
+                    status = StatusCodes.Status200OK
+                });
+            }
+            catch
+            {
+                return StatusCode(500, new { code = 500, detail = "Internal server error" });
+            }
         }
 
-        // GET api/<StudentProfileController>/5
         [HttpGet("{userId}/{studentId}")]
-        public async Task<StudentProfile> GetStudentProfile(int userId, int studentId)
+        public async Task<ActionResult<StudentProfile>> GetStudentProfile(int userId, int studentId)
         {
-            var student = await studentProfileRepository.GetStudentProfile(userId,studentId);
-            return student;
-        }     
-        [HttpGet("profile/{id}")]
-        public async Task<StudentProfile> GetStudentProfileById(int id)
-        {
-            var student = await studentProfileRepository.GetStudentProfileById(id);
-            return student;
-        }      
-        [HttpGet("major/{major}")]
-        public async Task<StudentProfile> GetStudentByMajor(string major)
-        {
-            var student = await studentProfileRepository.GetStudentProfileByMajor(major);
-            return student;
+            if (!IsAuthenticated())
+            {
+                return StatusCode(401, new { code = 401, detail = "Authentication required" });
+            }
+
+
+            if (!IsAuthorized())
+            {
+                return StatusCode(403, new { code = 403, detail = "You do not have permission" });
+            }
+
+            try
+            {
+                var student = await studentProfileRepository.GetStudentProfile(userId, studentId);
+                if (student == null)
+                {
+                    return NotFound(new { code = 404, detail = "Student profile not found" });
+                }
+                return Ok(new
+                {
+                    result = new
+                    {
+                        userId = student.UserId,
+                        studentId = student.StudentId,
+                        cohortCurriculumId = student.CohortCurriculumId,
+                        totalCredits = student.TotalCredits,
+                        debtCredits = student.DebtCredits,
+                    },
+                    status = StatusCodes.Status200OK
+                });
+            }
+            catch
+            {
+                return StatusCode(500, new { code = 500, detail = "Internal server error" });
+            }
         }
 
-        // POST api/<StudentProfileController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] StudentProfile studentProfile)
         {
+            if (!IsAuthenticated())
+            {
+                return StatusCode(401, new { code = 401, detail = "Authentication required" });
+            }
+
+
+            if (!IsAuthorized())
+            {
+                return StatusCode(403, new { code = 403, detail = "You do not have permission" });
+            }
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
-            await studentProfileRepository.Create(studentProfile);
-            return Ok(studentProfile);
+
+            try
+            {
+                var existingGrade = await studentProfileRepository.GetStudentProfile(studentProfile.UserId, studentProfile.StudentId);
+                if (existingGrade != null)
+                {
+                    return Conflict(new
+                    {
+                        code = StatusCodes.Status409Conflict,
+                        detail = "Student profile already exists"
+                    });
+                }
+                await studentProfileRepository.Create(studentProfile);
+                return Ok(new
+                {
+                    results =  new
+                    {
+                        userId = studentProfile.UserId,
+                        studentId = studentProfile.StudentId,
+                        cohortCurriculumId = studentProfile.CohortCurriculumId,
+                        totalCredits = studentProfile.TotalCredits,
+                        debtCredits = studentProfile.DebtCredits,
+                    },
+                    status = StatusCodes.Status200OK
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    code = StatusCodes.Status500InternalServerError,
+                    detail = "Internal server error",
+                    error = ex.InnerException?.Message ?? ex.Message
+                });
+            }
+
         }
 
-        // PUT api/<StudentProfileController>/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] StudentProfile studentProfile)
         {
+            if (!IsAuthenticated())
+            {
+                return StatusCode(401, new { code = 401, detail = "Authentication required" });
+            }
+
+
+            if (!IsAuthorized())
+            {
+                return StatusCode(403, new { code = 403, detail = "You do not have permission" });
+            }
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
-            var exist = await studentProfileRepository.GetStudentProfileById(id);
-            if (exist == null)
+
+            try
             {
-                return NotFound();
+                var exist = await studentProfileRepository.GetStudentProfileById(id);
+                if (exist == null)
+                {
+                    return NotFound(new { code = 404, detail = "Student profile not found" });
+                }
+
+                studentProfile.StudentId = id;
+                await studentProfileRepository.Update(studentProfile);
+                return Ok(new { result = studentProfile, status = 200 });
             }
-            studentProfile.StudentId = id;
-            await studentProfileRepository.Update(studentProfile);
-            return Ok("Updatse Success");
+            catch
+            {
+                return StatusCode(500, new { code = 500, detail = "Internal server error" });
+            }
         }
 
-        // DELETE api/<StudentProfileController>/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var exist = await studentProfileRepository.GetStudentProfileById(id);
-            if (exist == null)
+            if (!IsAuthenticated())
             {
-                return NotFound();
+                return StatusCode(401, new { code = 401, detail = "Authentication required" });
             }
-            await studentProfileRepository.Delete(id);
-            return Ok("Delete Success");
+
+
+            if (!IsAuthorized())
+            {
+                return StatusCode(403, new { code = 403, detail = "You do not have permission" });
+            }
+
+            try
+            {
+                var exist = await studentProfileRepository.GetStudentProfileById(id);
+                if (exist == null)
+                {
+                    return NotFound(new { code = 404, detail = "Student profile not found" });
+                }
+
+                await studentProfileRepository.Delete(id);
+                return Ok(new { status = 200, message = "Delete Success" });
+            }
+            catch
+            {
+                return StatusCode(500, new { code = 500, detail = "Internal server error" });
+            }
         }
     }
 }

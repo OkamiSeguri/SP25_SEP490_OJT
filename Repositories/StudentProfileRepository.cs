@@ -23,10 +23,10 @@ namespace Repositories
         {
             return await StudentProfileDAO.Instance.GetStudentProfileById(id);
         }     
-        public async Task<StudentProfile> GetStudentProfileByMajor(string major)
-        {
-            return await StudentProfileDAO.Instance.GetStudentProfileByMajor(major);
-        }
+        //public async Task<StudentProfile> GetStudentProfileByMajor(string major)
+        //{
+        //    return await StudentProfileDAO.Instance.GetStudentProfileByMajor(major);
+        //}
 
         public async Task Create(StudentProfile studentProfile)
         {

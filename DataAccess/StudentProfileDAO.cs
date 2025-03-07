@@ -14,7 +14,6 @@ namespace DataAccess
         {
             return await _context.StudentProfiles.AsNoTracking().ToListAsync();
         }
-
         public async Task<StudentProfile> GetStudentProfile(int UserId, int StudentId)
         {
             var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.UserId == UserId && c.StudentId == StudentId);
@@ -25,11 +24,11 @@ namespace DataAccess
             var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.StudentId == id);
             if (studentProfile == null) return null; return studentProfile;
         }      
-        public async Task<StudentProfile> GetStudentProfileByMajor(string major)
-        {
-            var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.Major == major);
-            if (studentProfile == null) return null; return studentProfile;
-        }
+        //public async Task<StudentProfile> GetStudentProfileByMajor(string major)
+        //{
+        //    var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.Major == major);
+        //    if (studentProfile == null) return null; return studentProfile;
+        //}
         public async Task Create(StudentProfile studentProfile)
         {
             await _context.StudentProfiles.AddAsync(studentProfile);
@@ -53,5 +52,6 @@ namespace DataAccess
                 await _context.SaveChangesAsync();
             }
         }
+
     }
 }

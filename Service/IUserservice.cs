@@ -9,7 +9,7 @@ namespace FOMSService
 {
     public interface IUserservice
     {
-        Task<IEnumerable<UserDTO>> GetUserAll();
+        Task<List<UserDTO>> GetUserAll();
         Task<UserDTO> GetUserById(int id);
         Task Create(UserDTO userDTO);
         Task Update(UserDTO userDTO);

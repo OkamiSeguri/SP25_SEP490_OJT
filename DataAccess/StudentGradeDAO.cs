@@ -13,7 +13,8 @@ namespace DataAccess
         public async Task<IEnumerable<StudentGrade>> GetGradesAll()
         {
             return await _context.StudentGrades.ToListAsync();
-        }
+        }     
+
         public async Task<IEnumerable<StudentGrade>> GetGradeByUserId(int id)
         {
             var grades = await _context.StudentGrades
@@ -31,8 +32,6 @@ namespace DataAccess
                 studentProfile = new StudentProfile
                 {
                     UserId = userId,
-                    Cohort = "Default", 
-                    Major = "Default",  
                     TotalCredits = 0,
                     DebtCredits = 0
                 };

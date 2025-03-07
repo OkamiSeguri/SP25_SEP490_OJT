@@ -12,7 +12,7 @@ namespace Repositories
         Task<IEnumerable<StudentProfile>> GetStudentProfileAll();
         Task<StudentProfile> GetStudentProfile(int UserId,int StudentId);
         Task<StudentProfile> GetStudentProfileById(int id);
-        Task<StudentProfile> GetStudentProfileByMajor(string major);
+        //Task<StudentProfile> GetStudentProfileByMajor(string major);
         Task Create(StudentProfile studentProfile);
         Task Update(StudentProfile studentProfile);
         Task Delete(int id);

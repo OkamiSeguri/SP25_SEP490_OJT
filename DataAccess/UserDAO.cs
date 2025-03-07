@@ -16,7 +16,7 @@ namespace DataAccess
                 .FirstOrDefaultAsync(c => c.Email == email && c.Password == password);
             return User;
         }
-        public async Task<IEnumerable<User>> GetUserAll()
+        public async Task<List<User>> GetUserAll()
         {
             return await _context.Users.ToListAsync();
         }
@@ -62,6 +62,8 @@ namespace DataAccess
                 await _context.SaveChangesAsync();
             }
         }
+     
+
 
     }
 }

@@ -26,6 +26,14 @@ namespace BusinessObject
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CohortCurriculum>()
+             .HasKey(cc => new { cc.CohortCurriculumId});
+
+            modelBuilder.Entity<StudentProfile>()
+           .HasOne(sp => sp.CohortCurriculum)
+           .WithMany(cc => cc.StudentProfiles)
+           .HasForeignKey(sp => sp.CohortCurriculumId);
+
             modelBuilder.Entity<StudentProfile>()
         .HasOne(s => s.User)
         .WithOne(u => u.StudentProfile)
@@ -33,8 +41,6 @@ namespace BusinessObject
         .OnDelete(DeleteBehavior.NoAction);
 
 
-            modelBuilder.Entity<CohortCurriculum>()
-                .HasKey(cc => new { cc.Cohort, cc.CurriculumId });
 
             modelBuilder.Entity<StudentGrade>()
                 .HasKey(sg => new { sg.UserId, sg.CurriculumId });
@@ -77,9 +83,13 @@ namespace BusinessObject
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", true, true);
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
             IConfigurationRoot configuration = builder.Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+
+            optionsBuilder.UseMySql(configuration.GetConnectionString("DefaultConnection"),
+                new MySqlServerVersion(new Version(9, 0, 0))); // Thay đổi phiên bản MySQL phù hợp
         }
+
     }
 }

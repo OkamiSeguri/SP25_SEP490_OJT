@@ -9,7 +9,7 @@ namespace Repositories
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetUserAll();
+        Task<List<User>> GetUserAll();
         Task<IEnumerable<User>> GetUserByRole(int type);
         Task<User> GetUserById(int id);
         Task<User> GetUserByEmail(string Email);
@@ -18,5 +18,7 @@ namespace Repositories
         Task Update(User user);
         Task Delete(int id);
         Task<User> GetCustomerByEmailAndPassword(string email, string password);
+    
+
     }
 }

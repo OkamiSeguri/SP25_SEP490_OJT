@@ -10,7 +10,7 @@ namespace Repositories
 {
     public class UserRepository : IUserRepository
     {
-        public async Task<IEnumerable<User>> GetUserAll()
+        public async Task<List<User>> GetUserAll()
         {
             return await UserDAO.Instance.GetUserAll();
         }
@@ -52,5 +52,8 @@ namespace Repositories
         {
             return await UserDAO.Instance.GetUserByEmailAndPassword(email, password);
         }
+
+    
+
     }
 }
