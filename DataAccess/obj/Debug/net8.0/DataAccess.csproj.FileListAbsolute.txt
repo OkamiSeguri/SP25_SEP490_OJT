@@ -9,9 +9,9 @@ C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.GeneratedM
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.AssemblyInfoInputs.cache
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.AssemblyInfo.cs
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.csproj.CoreCompileInputs.cache
+C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.sourcelink.json
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.csproj.Up2Date
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.dll
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\refint\DataAccess.dll
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.pdb
 C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\ref\DataAccess.dll
-C:\Users\USER\source\repos\OJT\DataAccess\obj\Debug\net8.0\DataAccess.sourcelink.json

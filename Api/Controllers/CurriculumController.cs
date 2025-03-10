@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using FOMSOData.Authorize;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
@@ -11,6 +12,8 @@ namespace FOMSOData.Controllers
 {
     [Route("odata/[controller]")]
     [ApiController]
+    [CustomAuthorize("1")]
+
     public class CurriculumController : ControllerBase
     {
         private readonly ICurriculumRepository curriculumRepository;
@@ -18,38 +21,12 @@ namespace FOMSOData.Controllers
         public CurriculumController()
         {
             curriculumRepository = new CurriculumRepository();
-
-
-        }
-        private bool IsAuthenticated()
-        {
-            return HttpContext.User.Identity != null && HttpContext.User.Identity.IsAuthenticated;
-        }
-
-        private bool IsAuthorized()
-        {
-            var roleClaim = User.FindFirst(ClaimTypes.Role);
-            return roleClaim != null && roleClaim.Value == "1";
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Curriculum>>> Get()
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
 
-            try
-            {
                 var curriculum = await curriculumRepository.GetCurriculumAll();
 
                 if (curriculum == null)
@@ -72,34 +49,12 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
-        }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Curriculum>> Get(int id)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
 
-            try
-            {
                 var curriculum = await curriculumRepository.GetCurriculumById(id);
                 if (curriculum == null)
                 {
@@ -107,68 +62,24 @@ namespace FOMSOData.Controllers
                 }
                 return Ok(curriculum);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
-        }
 
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Curriculum curriculum)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
 
-            try
-            {
                 await curriculumRepository.Create(curriculum);
                 return Ok(new {  result = curriculum, status = 200});
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
-        }
+
 
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] Curriculum curriculum)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(new
@@ -178,8 +89,6 @@ namespace FOMSOData.Controllers
                 });
             }
 
-            try
-            {
                 var exist = await curriculumRepository.GetCurriculumById(id);
                 if (exist == null)
                 {
@@ -194,34 +103,11 @@ namespace FOMSOData.Controllers
                 await curriculumRepository.Update(curriculum);
                 return Ok(new { result = curriculum, status = 200 });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
-        }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
 
-            try
-            {
                 var exist = await curriculumRepository.GetCurriculumById(id);
                 if (exist == null)
                 {
@@ -234,14 +120,6 @@ namespace FOMSOData.Controllers
                 await curriculumRepository.Delete(id);
                 return Ok(new { status = 200, message = "Delete Success" });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
-        }
+
     }
 }

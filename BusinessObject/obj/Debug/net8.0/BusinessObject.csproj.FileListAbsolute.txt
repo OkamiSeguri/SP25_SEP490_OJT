@@ -8,9 +8,9 @@ C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.Ge
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.AssemblyInfoInputs.cache
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.AssemblyInfo.cs
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.csproj.CoreCompileInputs.cache
+C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.sourcelink.json
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.dll
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\refint\BusinessObject.dll
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.pdb
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.genruntimeconfig.cache
 C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\ref\BusinessObject.dll
-C:\Users\USER\source\repos\OJT\BusinessObject\obj\Debug\net8.0\BusinessObject.sourcelink.json

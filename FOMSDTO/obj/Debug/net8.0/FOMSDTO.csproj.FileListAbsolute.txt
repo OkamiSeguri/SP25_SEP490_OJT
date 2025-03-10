@@ -5,8 +5,8 @@ C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.GeneratedMSBuild
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.AssemblyInfoInputs.cache
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.AssemblyInfo.cs
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.csproj.CoreCompileInputs.cache
+C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.sourcelink.json
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.dll
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\refint\FOMSDTO.dll
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.pdb
 C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\ref\FOMSDTO.dll
-C:\Users\USER\source\repos\OJT\FOMSDTO\obj\Debug\net8.0\FOMSDTO.sourcelink.json

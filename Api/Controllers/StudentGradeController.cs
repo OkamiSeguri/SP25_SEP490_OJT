@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using FOMSOData.Authorize;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
@@ -11,6 +12,7 @@ namespace FOMSOData.Controllers
 {
     [Route("odata/[controller]")]
     [ApiController]
+    [CustomAuthorize("1")]
 
     public class StudentGradeController : ControllerBase
     {
@@ -21,36 +23,12 @@ namespace FOMSOData.Controllers
             studentGradeRepository = new StudentGradeRepository();
             cohortCurriculumRepository = new CohortCurriculumRepository();
         }
-        private bool IsAuthenticated()
-        {
-            return HttpContext.User.Identity != null && HttpContext.User.Identity.IsAuthenticated;
-        }
-
-        private bool IsAuthorized()
-        {
-            var roleClaim = User.FindFirst(ClaimTypes.Role);
-            return roleClaim != null && roleClaim.Value == "1";
-        }
 
         // GET: api/<StudentGradeController>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentGrade>>> Get()
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
 
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
-            try
-            {
                 var grade = await studentGradeRepository.GetGradesAll();
                 if (grade == null)
                 {
@@ -98,33 +76,11 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
-        }
+
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetGradeByUserId(int userId)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
 
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
-            try
-            {
                 var grades = await studentGradeRepository.GetGradeByUserId(userId);
                 var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
 
@@ -171,35 +127,13 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                    error = ex.Message
-                });
-            }
-        }
+
         // GET api/<StudentGradeController>/5
         [HttpGet("{userId}/{curriculumId}")]
         public async Task<IActionResult> Get(int userId, int curriculumId)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
 
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
-            try
-            {
+
                 var grade = await studentGradeRepository.GetGrade(userId, curriculumId);
 
                 if (grade == null)
@@ -217,41 +151,18 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                    error = ex.Message
-                });
-            }
-        }
+
 
         // POST api/<StudentGradeController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] StudentGrade studentGrade)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
 
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
 
-            try
-            {
                 var existingGrade = await studentGradeRepository.GetGrade(studentGrade.UserId, studentGrade.CurriculumId);
                 if (existingGrade != null)
                 {
@@ -265,41 +176,18 @@ namespace FOMSOData.Controllers
                 return Ok(new { result = studentGrade, status = 200 });
 
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                    error = ex.Message
-                });
-            }
-        }
+
 
         // PUT api/<StudentGradeController>/5
         [HttpPut("{userId}/{curriculumId}")]
         public async Task<IActionResult> Put(int userId, int curriculumId, [FromBody] StudentGrade studentGrade)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
 
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
 
-            try
-            {
                 var exist = await studentGradeRepository.GetGrade(userId, curriculumId);
                 if (exist == null)
                 {
@@ -329,37 +217,14 @@ namespace FOMSOData.Controllers
                 });
 
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                    error = ex.InnerException?.Message ?? ex.Message
-                });
-            }
-        }
+
 
 
         // DELETE api/<StudentGradeController>/5
         [HttpDelete("{userId}/{curriculumId}")]
         public async Task<IActionResult> DeleteGrade(int userId, int curriculumId)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
 
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
-            try
-            {
                 var exist = await studentGradeRepository.GetGrade(userId, curriculumId);
                 if (exist == null)
                 {
@@ -378,15 +243,6 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                    error = ex.Message
-                });
-            }
-        }
+
     }
 }

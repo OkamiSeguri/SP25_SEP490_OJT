@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FOMSDTO")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5c011d106c165ec69dd75ec855267c117619dee8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7462d19d31daecaa14b8323580ca15b8a63fd42")]
 [assembly: System.Reflection.AssemblyProductAttribute("FOMSDTO")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FOMSDTO")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

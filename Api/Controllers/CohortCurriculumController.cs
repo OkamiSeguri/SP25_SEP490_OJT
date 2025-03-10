@@ -1,4 +1,5 @@
 ﻿using BusinessObject;
+using FOMSOData.Authorize;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
@@ -10,6 +11,7 @@ namespace FOMSOData.Controllers
 {
     [Route("odata/[controller]")]
     [ApiController]
+    [CustomAuthorize("1")]
 
     public class CohortCurriculumController : ControllerBase
     {
@@ -18,35 +20,11 @@ namespace FOMSOData.Controllers
         {
             cohortCurriculumRepository = new CohortCurriculumRepository();
         }
-        private bool IsAuthenticated()
-        {
-            return HttpContext.User.Identity != null && HttpContext.User.Identity.IsAuthenticated;
-        }
-
-        private bool IsAuthorized()
-        {
-            var roleClaim = User.FindFirst(ClaimTypes.Role);
-            return roleClaim != null && roleClaim.Value == "1";
-        }
         // GET: api/<CohortCurriculumController>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CohortCurriculum>>> Get()
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
 
-            try
-            {
                 var cohort = await cohortCurriculumRepository.GetCohortCurriculumAll();
                 if (cohort == null)
                 {
@@ -60,6 +38,7 @@ namespace FOMSOData.Controllers
                 {
                     results = cohort.Select(u => new
                     {
+                        cohortcurriculumId = u.CohortCurriculumId,
                         cohort = u.Cohort,
                         curriculumId = u.CurriculumId,
                         semester = u.Semester,
@@ -67,43 +46,23 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
-        }
+
 
         // GET api/<CohortCurriculumController>/5
-        [HttpGet("{cohort}/{curriculumId}")]
-        public async Task<ActionResult<CohortCurriculum>> Get(string cohort,int curriculumId)
+        [HttpGet("{cohortcurriculumId}")]
+        public async Task<ActionResult<CohortCurriculum>> Get(int cohortcurriculumId)
         {
-            if (!IsAuthenticated())
+
+            var cohorts = await cohortCurriculumRepository.GetCohortCurriculum(cohortcurriculumId);
+            if (cohorts == null)
             {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
+                return NotFound(new { code = 404, detail = "Curriculum not found." });
             }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
-            try
-            {
-                var cohorts = await cohortCurriculumRepository.GetCohortCurriculum(cohort, curriculumId);
-                if (cohorts == null)
-                {
-                    return NotFound(new { code = 404, detail = "Curriculum not found." });
-                }
-                return Ok(new
+            return Ok(new
                 {
                     result = new
                     {
+                        cohortcurriculumId = cohortcurriculumId,
                         cohort = cohorts.Cohort,
                         curriculumId = cohorts.CurriculumId,
                         semester = cohorts.Semester,
@@ -111,40 +70,19 @@ namespace FOMSOData.Controllers
                     },
                     status = StatusCodes.Status200OK
                 });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
         }
 
         // POST api/<CohortCurriculumController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CohortCurriculum cohortCurriculum)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
+
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
-            try
-            {
+
                 await cohortCurriculumRepository.Create(cohortCurriculum);
                 return Ok(new
                 {
@@ -153,78 +91,42 @@ namespace FOMSOData.Controllers
                         cohort = cohortCurriculum.Cohort,
                         curriculumId = cohortCurriculum.CurriculumId,
                         semester = cohortCurriculum.Semester,
-
                     },
                     status = StatusCodes.Status200OK
                 });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                });
-            }
-        }
+
             // PUT api/<CohortCurriculumController>/5
-            [HttpPut("{cohort}/{curriculumId}")]
-        public async Task<ActionResult> Put(string cohort,int curriculumId, [FromBody] CohortCurriculum cohortCurriculum)
+            [HttpPut("{cohortcurriculumId}")]
+        public async Task<ActionResult> Put(int cohortcurriculumId, [FromBody] CohortCurriculum cohortCurriculum)
         {
-            if (!IsAuthenticated())
-            {
-                return StatusCode(401, new { code = 401, detail = "Authentication required" });
-            }
-            if (!IsAuthorized())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new
-                {
-                    code = StatusCodes.Status403Forbidden,
-                    detail = "You do not have permission"
-                });
-            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
-            try
-            {
-                var exist = await cohortCurriculumRepository.GetCohortCurriculum(cohort,curriculumId);
+
+                var exist = await cohortCurriculumRepository.GetCohortCurriculum(cohortcurriculumId);
             if (exist == null)
             {
                 return NotFound();
             }
 
-            await cohortCurriculumRepository.Delete(cohort,curriculumId);
-
-            await cohortCurriculumRepository.Create(cohortCurriculum);
+            await cohortCurriculumRepository.Update(cohortCurriculum);
                 return Ok(new { result = cohortCurriculum, status = 200 });
 
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    code = StatusCodes.Status500InternalServerError,
-                    detail = "Internal server error",
-                    error = ex.Message
-                });
-            }
-        }
-
-
-
 
         // DELETE api/<CohortCurriculumController>/5
-        [HttpDelete("{cohort}/{curriculumId}")]
-        public async Task<ActionResult> Delete(string cohort,int curriculumId)
+        [HttpDelete("{cohortcurriculumId}")]
+        public async Task<ActionResult> Delete(int cohortcurriculumId)
         {
-            var exist = await cohortCurriculumRepository.GetCohortCurriculum(cohort,curriculumId);
+            var exist = await cohortCurriculumRepository.GetCohortCurriculum(cohortcurriculumId);
             if (exist == null)
             {
                 return NotFound();
             }
-            await cohortCurriculumRepository.Delete(cohort, curriculumId);
+            await cohortCurriculumRepository.Delete(cohortcurriculumId);
             return Ok("Delete Success");
         }
     }

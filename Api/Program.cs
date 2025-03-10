@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Services;
+using FOMSOData.Middleware;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
+using System.Net;
+
 var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
@@ -45,8 +50,17 @@ builder.Services.AddAuthentication(options =>
          ValidAudience = jwtSettings["Audience"],
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
      };
+ })
+.AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+ {
+     IConfigurationSection googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
+     options.ClientId = googleAuthSection["ClientId"];
+     options.ClientSecret = googleAuthSection["ClientSecret"];
+     options.CallbackPath = "/signin-google";
  });
 var app = builder.Build();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -59,6 +73,7 @@ app.UseODataBatching();
 app.UseRouting();
 
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
