@@ -32,9 +32,14 @@ namespace Repositories
         {
             await CurriculumDAO.Instance.Delete(id);
         }
-        public async Task ImportCurriculums(IEnumerable<Curriculum> curriculums)
+        public async Task<List<string>> ImportCurriculums(IEnumerable<Curriculum> curriculums)
         {
-            await CurriculumDAO.Instance.ImportCurriculumsAsync(curriculums);
+            return await CurriculumDAO.Instance.ImportCurriculumsAsync(curriculums);
+        }
+
+        public async Task<List<int>> GetAllIds()
+        {
+            return await CurriculumDAO.Instance.GetAllIds();
         }
 
 

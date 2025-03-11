@@ -42,20 +42,54 @@ namespace DataAccess
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task ImportCurriculumsAsync(IEnumerable<Curriculum> cohorts)
+        public async Task<List<string>> ImportCurriculumsAsync(IEnumerable<Curriculum> curriculums)
         {
-            foreach (var cohort in cohorts)
+            var existingCurriculums = await _context.Curriculums.ToListAsync(); 
+            var existingSubjectCodes = existingCurriculums.Select(c => c.SubjectCode).ToHashSet();
+            var existingIds = existingCurriculums.Select(c => c.CurriculumId).ToHashSet(); 
+
+            List<string> duplicateSubjectCodes = new List<string>();
+
+            foreach (var curriculum in curriculums)
             {
-                var existingCurriculum = await _context.Curriculums.FindAsync(cohort.CurriculumId);
-                if (existingCurriculum != null)
+                if (existingIds.Contains(curriculum.CurriculumId))
                 {
-                    _context.Entry(existingCurriculum).State = EntityState.Detached; 
+                    // ✅ CurriculumId đã tồn tại → Ghi đè
+                    var existingCurriculum = await _context.Curriculums.FindAsync(curriculum.CurriculumId);
+                    _context.Entry(existingCurriculum).CurrentValues.SetValues(curriculum);
+                }
+                else
+                {
+                    // ✅ CurriculumId không tồn tại → Kiểm tra SubjectCode
+                    if (existingSubjectCodes.Contains(curriculum.SubjectCode))
+                    {
+                        duplicateSubjectCodes.Add(curriculum.SubjectCode); 
+                    }
+                    else
+                    {
+                        await _context.Curriculums.AddAsync(curriculum); 
+                    }
                 }
             }
 
-            await _context.Curriculums.AddRangeAsync(cohorts);
-            await _context.SaveChangesAsync();
+            if (duplicateSubjectCodes.Count > 0)
+            {
+                return duplicateSubjectCodes; 
+            }
+
+            await _context.SaveChangesAsync(); 
+            return new List<string>(); 
         }
+
+
+
+
+        public async Task<List<int>> GetAllIds()
+        {
+            using var context = new ApplicationDbContext();
+            return await context.Curriculums.Select(c => c.CurriculumId).ToListAsync();
+        }
+
 
     }
 }

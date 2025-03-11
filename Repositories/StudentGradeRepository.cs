@@ -48,9 +48,12 @@ namespace Repositories
 
         }
 
-        public async Task ImportStudentGrades(IEnumerable<StudentGrade> studentGrade)
+        public async Task<(List<int> MissingUserIds, List<int> MissingCurriculumIds)> ImportStudentGrades(IEnumerable<StudentGrade> grades)
         {
-            await StudentGradeDAO.Instance.ImportStudentGradesAsync(studentGrade);
+            return await StudentGradeDAO.Instance.ImportStudentGradesAsync(grades);
         }
+
+
+
     }
 }

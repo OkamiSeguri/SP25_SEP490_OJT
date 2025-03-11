@@ -248,9 +248,8 @@ namespace FOMSOData.Controllers
                 });
             }
         [HttpPost("import")]
-        public async Task<IActionResult> ImportCsv([FromForm] IFormFile file)
+        public async Task<IActionResult> ImportCsv(IFormFile file)
         {
-
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "File is empty or missing." });
 
@@ -259,9 +258,24 @@ namespace FOMSOData.Controllers
             {
                 csv.Context.RegisterClassMap<StudentGradeMap>();
                 var records = csv.GetRecords<StudentGrade>().ToList();
-                await studentGradeRepository.ImportStudentGrades(records);
-                return Ok(new { message = "Student Grade CSV imported successfully!", count = records.Count });
+
+                var (missingUserIds, missingCurriculumIds) = await studentGradeRepository.ImportStudentGrades(records);
+
+                if (missingUserIds.Count > 0 || missingCurriculumIds.Count > 0)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Some UserId or CurriculumId does not exist!",
+                        missingUsers = missingUserIds,
+                        missingCurriculums = missingCurriculumIds
+                    });
+                }
+
+                return Ok(new { message = "Student Grades CSV imported successfully!", count = records.Count });
             }
         }
+
+
+
     }
 }

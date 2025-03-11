@@ -100,19 +100,38 @@ namespace DataAccess
 
             }
         }
-        public async Task ImportStudentGradesAsync(IEnumerable<StudentGrade> grades)
+        public async Task<(List<int> MissingUserIds, List<int> MissingCurriculumIds)> ImportStudentGradesAsync(IEnumerable<StudentGrade> grades)
         {
+            var existingCurriculumIds = await _context.Curriculums.Select(c => c.CurriculumId).ToHashSetAsync();
+            var existingUserIds = await _context.Users.Select(u => u.UserId).ToHashSetAsync();
+
+            List<int> missingUserIds = new List<int>();
+            List<int> missingCurriculumIds = new List<int>();
+
             foreach (var grade in grades)
             {
-                var existingStudentGrade = await _context.StudentGrades.FindAsync(grade.UserId,grade.CurriculumId);
-                if (existingStudentGrade != null)
+                if (!existingUserIds.Contains(grade.UserId))
                 {
-                    _context.Entry(existingStudentGrade).State = EntityState.Detached;
+                    missingUserIds.Add(grade.UserId);
                 }
+                if (!existingCurriculumIds.Contains(grade.CurriculumId))
+                {
+                    missingCurriculumIds.Add(grade.CurriculumId);
+                }
+            }
+
+            if (missingUserIds.Count > 0 || missingCurriculumIds.Count > 0)
+            {
+                return (missingUserIds, missingCurriculumIds); // ✅ Trả về danh sách lỗi riêng biệt
             }
 
             await _context.StudentGrades.AddRangeAsync(grades);
             await _context.SaveChangesAsync();
+
+            return (new List<int>(), new List<int>()); // ✅ Trả về rỗng nếu thành công
         }
+
+
+
     }
 }

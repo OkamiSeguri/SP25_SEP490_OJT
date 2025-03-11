@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using System.Globalization;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 
@@ -20,9 +21,12 @@ namespace FOMSOData.Controllers
     public class CohortCurriculumController : ControllerBase
     {
         private readonly ICohortCurriculumRepository cohortCurriculumRepository;
+        private readonly ICurriculumRepository curriculumRepository;
+
         public CohortCurriculumController()
         {
             cohortCurriculumRepository = new CohortCurriculumRepository();
+            curriculumRepository = new CurriculumRepository();
         }
         // GET: api/<CohortCurriculumController>
         [HttpGet]
@@ -134,7 +138,7 @@ namespace FOMSOData.Controllers
             return Ok("Delete Success");
         }
         [HttpPost("import")]
-        public async Task<IActionResult> ImportCsv([FromForm] IFormFile file)
+        public async Task<IActionResult> ImportCsv(IFormFile file)
         {
 
             if (file == null || file.Length == 0)
@@ -145,6 +149,19 @@ namespace FOMSOData.Controllers
             {
                 csv.Context.RegisterClassMap<CohortCurriculumMap>();
                 var records = csv.GetRecords<CohortCurriculum>().ToList();
+                var existingCurriculumIds = (await curriculumRepository.GetAllIds()).ToHashSet();
+
+                // 🚨 Kiểm tra xem dữ liệu import có CurriculumId nào không tồn tại không
+                var invalidRecords = records.Where(r => !existingCurriculumIds.Contains(r.CurriculumId)).ToList();
+                if (invalidRecords.Any())
+                {
+                    return BadRequest(new
+                    {
+                        message = "CurriculumId does not exist in the system.",
+                        invalidCurriculumIds = invalidRecords.Select(r => r.CurriculumId).Distinct()
+                    });
+                }
+
                 await cohortCurriculumRepository.ImportCohortCurriculum(records);
                 return Ok(new { message = "Cohort Curriculum CSV imported successfully!", count = records.Count });
             }

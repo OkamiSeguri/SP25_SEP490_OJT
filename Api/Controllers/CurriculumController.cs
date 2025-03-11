@@ -128,10 +128,9 @@ namespace FOMSOData.Controllers
             }
 
 
-        [HttpPost("import-curriculum")]
-        public async Task<IActionResult> ImportCsv([FromForm] IFormFile file)
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportCsv(IFormFile file)
         {
-
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "File is empty or missing." });
 
@@ -140,9 +139,22 @@ namespace FOMSOData.Controllers
             {
                 csv.Context.RegisterClassMap<CurriculumMap>();
                 var records = csv.GetRecords<Curriculum>().ToList();
-                await curriculumRepository.ImportCurriculums(records);
+
+                var duplicateSubjectCodes = await curriculumRepository.ImportCurriculums(records);
+
+                if (duplicateSubjectCodes.Count > 0) 
+                {
+                    return BadRequest(new
+                    {
+                        message = "Some SubjectCode already exists!",
+                        duplicates = duplicateSubjectCodes
+                    });
+                }
+
                 return Ok(new { message = "Curriculum CSV imported successfully!", count = records.Count });
             }
         }
+
+
     }
 }
