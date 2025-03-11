@@ -45,11 +45,11 @@ namespace FOMSOData.Controllers
                 });
             }
 
-        [HttpGet("{userId}/{studentId}")]
-        public async Task<ActionResult<StudentProfile>> GetStudentProfile(int userId, int studentId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<StudentProfile>> GetStudentProfile(int id)
         {
 
-                var student = await studentProfileRepository.GetStudentProfile(userId, studentId);
+                var student = await studentProfileRepository.GetStudentProfileById(id);
                 if (student == null)
                 {
                     return NotFound(new { code = 404, detail = "Student profile not found" });
@@ -133,6 +133,31 @@ namespace FOMSOData.Controllers
                 return Ok(new { status = 200, message = "Delete Success" });
             }
 
-        
+        [HttpGet("check/{userId}")]
+        public async Task<IActionResult> CheckOJT(int userId)
+        {
+            var studentProfile = await studentProfileRepository.GetStudentProfileById(userId);
+            if (studentProfile == null)
+                return NotFound(new { message = "Student profile not found." });
+
+            double debtRatio = (double)studentProfile.DebtCredits.GetValueOrDefault()
+                               / studentProfile.TotalCredits.GetValueOrDefault();
+            var failedMandatorySubjects = await studentProfileRepository.GetFailedMandatorySubjectsAsync(userId);
+
+            // List of errors
+            List<string> errors = new List<string>();
+
+            if (debtRatio > 0.1)
+                errors.Add("Outstanding credits exceed 10% of the total credits.");
+
+            if (failedMandatorySubjects.Any())
+                errors.Add("Failed mandatory subjects.");
+
+            if (errors.Count > 0)
+                return Ok(new { message = "Not eligible for OJT", reasons = errors });
+
+            return Ok(new { message = "Eligible for OJT." });
+        }
+
     }
 }

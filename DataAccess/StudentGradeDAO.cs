@@ -52,9 +52,9 @@ namespace DataAccess
                 if (curriculumCredits.TryGetValue(grade.CurriculumId, out int credits))
                 {
                     if (grade.Grade >= 5)
-                        totalCredits += credits; // Đậu -> Cộng vào TotalCredits
+                        totalCredits += credits; 
                     else
-                        debtCredits += credits; // Rớt -> Cộng vào DebtCredits
+                        debtCredits += credits; 
                 }
             }
 
@@ -99,6 +99,20 @@ namespace DataAccess
                 await UpdateStudentCredits(UserId);
 
             }
+        }
+        public async Task ImportStudentGradesAsync(IEnumerable<StudentGrade> grades)
+        {
+            foreach (var grade in grades)
+            {
+                var existingStudentGrade = await _context.StudentGrades.FindAsync(grade.UserId,grade.CurriculumId);
+                if (existingStudentGrade != null)
+                {
+                    _context.Entry(existingStudentGrade).State = EntityState.Detached;
+                }
+            }
+
+            await _context.StudentGrades.AddRangeAsync(grades);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -14,6 +14,8 @@ namespace Repositories
         Task Create(CohortCurriculum cohortCurriculum);
         Task Update(CohortCurriculum cohortCurriculum);
         Task Delete(int cohortcurriculumId);
+        Task ImportCohortCurriculum(IEnumerable<CohortCurriculum> cohortCurriculum);
+
     }
 }
 

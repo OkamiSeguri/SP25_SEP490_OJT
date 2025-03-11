@@ -33,6 +33,10 @@ namespace Repositories
         {
             await CohortCurriculumDAO.Instance.Delete(cohortcurriculumId);
         }
+        public async Task ImportCohortCurriculum(IEnumerable<CohortCurriculum> cohortCurriculum)
+        {
+            await CohortCurriculumDAO.Instance.ImportCohortCurriculumAsync(cohortCurriculum);
+        }
 
     }
 }

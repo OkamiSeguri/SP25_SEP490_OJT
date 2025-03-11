@@ -47,5 +47,10 @@ namespace Repositories
             await UpdateStudentCredits(UserId);
 
         }
+
+        public async Task ImportStudentGrades(IEnumerable<StudentGrade> studentGrade)
+        {
+            await StudentGradeDAO.Instance.ImportStudentGradesAsync(studentGrade);
+        }
     }
 }

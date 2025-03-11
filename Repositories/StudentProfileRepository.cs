@@ -23,10 +23,6 @@ namespace Repositories
         {
             return await StudentProfileDAO.Instance.GetStudentProfileById(id);
         }     
-        //public async Task<StudentProfile> GetStudentProfileByMajor(string major)
-        //{
-        //    return await StudentProfileDAO.Instance.GetStudentProfileByMajor(major);
-        //}
 
         public async Task Create(StudentProfile studentProfile)
         {
@@ -39,6 +35,15 @@ namespace Repositories
         public async Task Delete(int id)
         {
             await StudentProfileDAO.Instance.Delete(id);
+        }
+        public async Task<IEnumerable<Curriculum>> GetMandatorySubjectsAsync(int userId)
+        {
+            return await StudentProfileDAO.Instance.GetMandatorySubjectsAsync(userId);
+        }
+
+        public async Task<IEnumerable<Curriculum>> GetFailedMandatorySubjectsAsync(int userId)
+        {
+            return await StudentProfileDAO.Instance.GetFailedMandatorySubjectsAsync(userId);
         }
     }
 }

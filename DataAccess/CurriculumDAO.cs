@@ -42,5 +42,20 @@ namespace DataAccess
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task ImportCurriculumsAsync(IEnumerable<Curriculum> cohorts)
+        {
+            foreach (var cohort in cohorts)
+            {
+                var existingCurriculum = await _context.Curriculums.FindAsync(cohort.CurriculumId);
+                if (existingCurriculum != null)
+                {
+                    _context.Entry(existingCurriculum).State = EntityState.Detached; 
+                }
+            }
+
+            await _context.Curriculums.AddRangeAsync(cohorts);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

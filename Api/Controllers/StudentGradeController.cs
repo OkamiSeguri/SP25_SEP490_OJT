@@ -1,10 +1,14 @@
 ﻿using BusinessObject;
+using CsvHelper;
 using FOMSOData.Authorize;
+using FOMSOData.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Claims;
+using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -243,6 +247,21 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportCsv([FromForm] IFormFile file)
+        {
 
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "File is empty or missing." });
+
+            using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
+            using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
+            {
+                csv.Context.RegisterClassMap<StudentGradeMap>();
+                var records = csv.GetRecords<StudentGrade>().ToList();
+                await studentGradeRepository.ImportStudentGrades(records);
+                return Ok(new { message = "Student Grade CSV imported successfully!", count = records.Count });
+            }
+        }
     }
 }

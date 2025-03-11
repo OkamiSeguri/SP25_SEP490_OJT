@@ -271,15 +271,6 @@ namespace FOMSOData.Controllers
         public async Task<ActionResult> Login([FromBody] LoginDTO loginDTO)
         {
 
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(new
-                    {
-                        code = StatusCodes.Status400BadRequest,
-                        detail = "Invalid request data."
-                    });
-                }
-
                 var user = await userRepository.ValidateUser(loginDTO.Email, loginDTO.Password);
                 if (user == null)
                 {

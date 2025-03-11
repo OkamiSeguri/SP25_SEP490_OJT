@@ -24,11 +24,7 @@ namespace DataAccess
             var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.StudentId == id);
             if (studentProfile == null) return null; return studentProfile;
         }      
-        //public async Task<StudentProfile> GetStudentProfileByMajor(string major)
-        //{
-        //    var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.Major == major);
-        //    if (studentProfile == null) return null; return studentProfile;
-        //}
+
         public async Task Create(StudentProfile studentProfile)
         {
             await _context.StudentProfiles.AddAsync(studentProfile);
@@ -51,6 +47,20 @@ namespace DataAccess
                 _context.StudentProfiles.Remove(studentProfile);
                 await _context.SaveChangesAsync();
             }
+        }
+        public async Task<IEnumerable<Curriculum>> GetMandatorySubjectsAsync(int userId)
+        {
+            return await _context.Curriculums
+                .Where(c => c.IsMandatory)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Curriculum>> GetFailedMandatorySubjectsAsync(int userId)
+        {
+            return await _context.StudentGrades
+                .Where(sg => sg.UserId == userId && sg.IsPassed == 0 && sg.Curriculum.IsMandatory)
+                .Select(sg => sg.Curriculum)
+                .ToListAsync();
         }
 
     }

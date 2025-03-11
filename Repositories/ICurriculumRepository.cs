@@ -14,5 +14,7 @@ namespace Repositories
         Task Create(Curriculum curriculum);
         Task Update(Curriculum curriculum);
         Task Delete(int id);
+        Task ImportCurriculums(IEnumerable<Curriculum> curriculums);
+
     }
 }
