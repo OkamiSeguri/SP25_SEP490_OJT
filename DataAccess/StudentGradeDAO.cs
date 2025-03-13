@@ -122,13 +122,13 @@ namespace DataAccess
 
             if (missingUserIds.Count > 0 || missingCurriculumIds.Count > 0)
             {
-                return (missingUserIds, missingCurriculumIds); // ✅ Trả về danh sách lỗi riêng biệt
+                return (missingUserIds, missingCurriculumIds); 
             }
 
             await _context.StudentGrades.AddRangeAsync(grades);
             await _context.SaveChangesAsync();
 
-            return (new List<int>(), new List<int>()); // ✅ Trả về rỗng nếu thành công
+            return (new List<int>(), new List<int>()); 
         }
 
 

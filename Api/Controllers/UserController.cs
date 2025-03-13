@@ -41,34 +41,35 @@ namespace FOMSOData.Controllers
         [HttpGet("admin")]
         public async Task<ActionResult> GetAllUsers()
         {
+            var users = await userRepository.GetUserAll();
 
-
-                var users = await userRepository.GetUserAll();
-
-                if (users == null || !users.Any())
+            if (users == null || !users.Any())
+            {
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        status = StatusCodes.Status404NotFound,
-                        detail = "No users found."
-                    });
-                }
-
-                return Ok(new
-                {
-                    results = users.Select(u => new
-                    {
-                        id = u.UserId,
-                        fullname = u.FullName,
-                        email = u.Email,
-                        password = u.Password,
-                        role = u.Role
-                    }),
-                    status = StatusCodes.Status200OK
+                    status = StatusCodes.Status404NotFound,
+                    detail = "No users found."
                 });
             }
-        [CustomAuthorize("1","2")]
 
+            var filteredUsers = users.Where(u => u.Role != 3);
+
+
+            return Ok(new
+            {
+                results = filteredUsers.Select(u => new
+                {
+                    id = u.UserId,
+                    fullname = u.FullName,
+                    email = u.Email,
+                    password = u.Password,
+                    role = u.Role
+                }),
+                status = StatusCodes.Status200OK
+            });
+        }
+
+        [CustomAuthorize("1","2")]
         [HttpGet("staff-enter")]
         public async Task<ActionResult> GetUsersWithRole0()
         {

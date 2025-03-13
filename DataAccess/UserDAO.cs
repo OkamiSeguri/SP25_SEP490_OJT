@@ -41,7 +41,7 @@ namespace DataAccess
         }
         public async Task Create(User user)
         {
-            await _context.Users.AddAsync(user);
+            await _context.Users.AddAsync(user); 
             await _context.SaveChangesAsync();
         }
         public async Task Update(User user)
@@ -62,8 +62,5 @@ namespace DataAccess
                 await _context.SaveChangesAsync();
             }
         }
-     
-
-
     }
 }
