@@ -11,9 +11,9 @@ namespace BusinessObject
     {
         [Key]
         public int OJTId { get; set; }
+        public int ResultId { get; set; }
         public decimal Score { get; set; }
         public string Comments { get; set; }
         public OJTRegistration OJTRegistration { get; set; }
-
     }
 }

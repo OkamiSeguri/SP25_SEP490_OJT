@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\USER\\source\\repos\\OJT\\Api\\FOMSOData.csproj": {}
+    "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Api\\FOMSOData.csproj": {}
   },
   "projects": {
-    "C:\\Users\\USER\\source\\repos\\OJT\\Api\\FOMSOData.csproj": {
+    "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Api\\FOMSOData.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\USER\\source\\repos\\OJT\\Api\\FOMSOData.csproj",
+        "projectUniqueName": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Api\\FOMSOData.csproj",
         "projectName": "FOMSOData",
-        "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\Api\\FOMSOData.csproj",
-        "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\USER\\source\\repos\\OJT\\Api\\obj\\",
+        "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Api\\FOMSOData.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Api\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,14 +32,14 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\USER\\source\\repos\\OJT\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\BusinessObject\\BusinessObject.csproj"
+              "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\BusinessObject\\BusinessObject.csproj"
               },
-              "C:\\Users\\USER\\source\\repos\\OJT\\DataAccess\\DataAccess.csproj": {
-                "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\DataAccess\\DataAccess.csproj"
+              "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\DataAccess\\DataAccess.csproj": {
+                "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\DataAccess\\DataAccess.csproj"
               },
-              "C:\\Users\\USER\\source\\repos\\OJT\\Repositories\\Repositories.csproj": {
-                "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\Repositories\\Repositories.csproj"
+              "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Repositories\\Repositories.csproj": {
+                "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Repositories\\Repositories.csproj"
               }
             }
           }
@@ -49,7 +53,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -121,21 +126,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\USER\\source\\repos\\OJT\\BusinessObject\\BusinessObject.csproj": {
+    "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\BusinessObject\\BusinessObject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\USER\\source\\repos\\OJT\\BusinessObject\\BusinessObject.csproj",
+        "projectUniqueName": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\BusinessObject\\BusinessObject.csproj",
         "projectName": "BusinessObject",
-        "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\BusinessObject\\BusinessObject.csproj",
-        "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\USER\\source\\repos\\OJT\\BusinessObject\\obj\\",
+        "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\BusinessObject\\BusinessObject.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\BusinessObject\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -160,7 +169,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -215,21 +225,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\USER\\source\\repos\\OJT\\DataAccess\\DataAccess.csproj": {
+    "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\DataAccess\\DataAccess.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\USER\\source\\repos\\OJT\\DataAccess\\DataAccess.csproj",
+        "projectUniqueName": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\DataAccess\\DataAccess.csproj",
         "projectName": "DataAccess",
-        "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\DataAccess\\DataAccess.csproj",
-        "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\USER\\source\\repos\\OJT\\DataAccess\\obj\\",
+        "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\DataAccess\\DataAccess.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\DataAccess\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -243,8 +257,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\USER\\source\\repos\\OJT\\BusinessObject\\BusinessObject.csproj": {
-                "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\BusinessObject\\BusinessObject.csproj"
+              "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\BusinessObject\\BusinessObject.csproj": {
+                "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\BusinessObject\\BusinessObject.csproj"
               }
             }
           }
@@ -258,7 +272,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -279,21 +294,25 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\USER\\source\\repos\\OJT\\Repositories\\Repositories.csproj": {
+    "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Repositories\\Repositories.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\USER\\source\\repos\\OJT\\Repositories\\Repositories.csproj",
+        "projectUniqueName": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Repositories\\Repositories.csproj",
         "projectName": "Repositories",
-        "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\Repositories\\Repositories.csproj",
-        "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\USER\\source\\repos\\OJT\\Repositories\\obj\\",
+        "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Repositories\\Repositories.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\Repositories\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -307,8 +326,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\USER\\source\\repos\\OJT\\DataAccess\\DataAccess.csproj": {
-                "projectPath": "C:\\Users\\USER\\source\\repos\\OJT\\DataAccess\\DataAccess.csproj"
+              "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\DataAccess\\DataAccess.csproj": {
+                "projectPath": "D:\\Codes\\OJT_API\\SP25_SEP490_OJT\\DataAccess\\DataAccess.csproj"
               }
             }
           }
@@ -322,7 +341,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -343,7 +363,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
