@@ -18,6 +18,26 @@ namespace Repositories
         {
             return await OJTProgramDAO.Instance.GetOJTProgramById(id);
         }
+        public async Task<IEnumerable<OJTProgram>> ApproveRequest(int id)
+        {
+            return (IEnumerable<OJTProgram>)await OJTProgramDAO.Instance.ApproveRequest(id);
+        }
+        public async Task<IEnumerable<OJTProgram>> RejectRequest(int id)
+        {
+            return (IEnumerable<OJTProgram>)await OJTProgramDAO.Instance.RejectRequest(id);
+        }
+        public async Task<IEnumerable<OJTProgram>> ListApproved()
+        {
+            return await OJTProgramDAO.Instance.ListApproved();
+        }
+        public async Task<IEnumerable<OJTProgram>> ListRejected()
+        {
+            return await OJTProgramDAO.Instance.ListRejected();
+        }
+        public async Task<IEnumerable<OJTProgram>> ListPending()
+        {
+            return await OJTProgramDAO.Instance.ListPending();
+        }
         public async Task Create(OJTProgram ojtProgram)
         {
             await OJTProgramDAO.Instance.Create(ojtProgram);

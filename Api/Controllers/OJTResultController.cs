@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BusinessObject;
 using Repositories;
+using FOMSOData.Authorize;
 
 namespace FOMSOData.Controllers
 {
-    [Route("odate/[controller]")]
+    [Route("odata/[controller]")]
     [ApiController]
     public class OJTResultController : ControllerBase
     {
@@ -14,19 +15,22 @@ namespace FOMSOData.Controllers
             ojtResultRepository = new OJTResultRepository();
         }
         // GET: api/<OJTResultController>
+        [CustomAuthorize("0", "1")]
         [HttpGet]
         public async Task<IEnumerable<OJTResult>> Get()
         {
             var ojtResult = await ojtResultRepository.GetOJTResultAll();
             return ojtResult;
         }
-        [HttpGet]
+        [CustomAuthorize("0", "1")]
+        [HttpGet("{id}")]
         public async Task<OJTResult> Get(int id)
         {
             var ojtResult = await ojtResultRepository.GetOJTResultById(id);
             return ojtResult;
         }
         // POST api/<OJTResultController>
+        [CustomAuthorize("2")]
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] OJTResult ojtResult)
         {
@@ -38,6 +42,7 @@ namespace FOMSOData.Controllers
             return Ok(ojtResult);
         }
         // PUT api/<OJTResultController>/5
+        [CustomAuthorize("2")]
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] OJTResult ojtResult)
         {
@@ -55,6 +60,7 @@ namespace FOMSOData.Controllers
             return Ok(ojtResult);
         }
         // DELETE api/<OJTResultController>/5
+        [CustomAuthorize("2")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

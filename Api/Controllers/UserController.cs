@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 using Repositories;
 using Services;
 using System.Data;
-using Services;
 using Microsoft.AspNetCore.Authorization;
 using API.Models;
 using FOMSOData.Models;
@@ -41,32 +40,33 @@ namespace FOMSOData.Controllers
         [HttpGet("admin")]
         public async Task<ActionResult> GetAllUsers()
         {
+            var users = await userRepository.GetUserAll();
 
-
-                var users = await userRepository.GetUserAll();
-
-                if (users == null || !users.Any())
+            if (users == null || !users.Any())
+            {
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        status = StatusCodes.Status404NotFound,
-                        detail = "No users found."
-                    });
-                }
-
-                return Ok(new
-                {
-                    results = users.Select(u => new
-                    {
-                        id = u.UserId,
-                        fullname = u.FullName,
-                        email = u.Email,
-                        password = u.Password,
-                        role = u.Role
-                    }),
-                    status = StatusCodes.Status200OK
+                    status = StatusCodes.Status404NotFound,
+                    detail = "No users found."
                 });
             }
+
+            var filteredUsers = users.Where(u => u.Role != 3);
+
+
+            return Ok(new
+            {
+                results = filteredUsers.Select(u => new
+                {
+                    id = u.UserId,
+                    fullname = u.FullName,
+                    email = u.Email,
+                    password = u.Password,
+                    role = u.Role
+                }),
+                status = StatusCodes.Status200OK
+            });
+        }
         [CustomAuthorize("1","2")]
 
         [HttpGet("staff-enter")]
@@ -141,7 +141,7 @@ namespace FOMSOData.Controllers
                     },
                     status = StatusCodes.Status200OK
                 });
-            }
+        }
 
         [CustomAuthorize("3")]
         [HttpGet("admin/{id}")]
@@ -178,7 +178,7 @@ namespace FOMSOData.Controllers
                     },
                     status = StatusCodes.Status200OK
                 });
-            }
+        }
 
         // POST api/<UserController>
         [CustomAuthorize("3")]
@@ -208,7 +208,7 @@ namespace FOMSOData.Controllers
                     },
                     status = StatusCodes.Status200OK
                 });
-            }
+        }
 
         // PUT api/<UserController>/5
         [CustomAuthorize("3")]
@@ -352,11 +352,6 @@ namespace FOMSOData.Controllers
 
                     }
                 });
-            }
-
-            
-        
-
-
+        }
     }
 }

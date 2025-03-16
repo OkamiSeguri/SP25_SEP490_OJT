@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BusinessObject;
 using Repositories;
+using FOMSOData.Authorize;
 
 namespace FOMSOData.Controllers
 {
@@ -13,6 +14,7 @@ namespace FOMSOData.Controllers
         {
             ojtFeedbackRepository = new OJTFeedbackRepository();
         }
+        [CustomAuthorize("2")]
         // GET: api/<OJTFeedbackController>
         [HttpGet]
         public async Task<IEnumerable<OJTFeedback>> Get()
@@ -20,13 +22,15 @@ namespace FOMSOData.Controllers
             var ojtFeedback = await ojtFeedbackRepository.GetOJTFeedbackAll();
             return ojtFeedback;
         }
-        [HttpGet]
+        [CustomAuthorize("0","2")]
+        [HttpGet("{id}")]
         public async Task<OJTFeedback> Get(int id)
         {
             var ojtFeedback = await ojtFeedbackRepository.GetOJTFeedbackById(id);
             return ojtFeedback;
         }
         // POST api/<OJTFeedbackController>
+        [CustomAuthorize("0", "2")]
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] OJTFeedback ojtFeedback)
         {
@@ -38,6 +42,7 @@ namespace FOMSOData.Controllers
             return Ok(ojtFeedback);
         }
         // PUT api/<OJTFeedbackController>/5
+        [CustomAuthorize("0", "2")]
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] OJTFeedback ojtFeedback)
         {
@@ -55,6 +60,7 @@ namespace FOMSOData.Controllers
             return Ok(ojtFeedback);
         }
         // DELETE api/<OJTFeedbackController>/5
+        [CustomAuthorize("0","2")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

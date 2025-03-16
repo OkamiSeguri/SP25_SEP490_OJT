@@ -33,53 +33,56 @@ namespace FOMSOData.Controllers
         public async Task<ActionResult<IEnumerable<StudentGrade>>> Get()
         {
 
-                var grade = await studentGradeRepository.GetGradesAll();
-                if (grade == null)
+            var grade = await studentGradeRepository.GetGradesAll();
+            if (grade == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, new
-                    {
-                        code21 = StatusCodes.Status404NotFound,
-                        detail = "No grade found"
-                    });
-                }
-                var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
-
-                var result = grade.Select(g =>
-                {
-                    // Lấy semester tối đa của 23
-                    // curriculum trong cohort
-                    var maxSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Max(cc => cc.Semester);
-
-                    var minSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Min(cc => (int?)cc.Semester) ?? 0;
-                    int slowBy = g.Semester - maxSemester;  
-                    int fastBy = minSemester - g.Semester;  
-
-                    bool isSlowStudy = slowBy > 0;
-                    bool isFastStudy = fastBy > 0;
-
-
-                    return new
-                    {
-                        userId = g.UserId,
-                        curriculumId = g.CurriculumId,
-                        semester = g.Semester,
-                        grade = g.Grade,
-                        ispass = g.IsPassed,
-                        status = isSlowStudy
-                    ? $"Slow study by {slowBy} semesters"
-                    : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
-                    };
-                });
-                return Ok(new
-                {
-                    results = result,
-                    status = StatusCodes.Status200OK
+                    code21 = StatusCodes.Status404NotFound,
+                    detail = "No grade found"
                 });
             }
+            var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
+
+            var result = grade.Select(g =>
+            {
+
+                var maxSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Select(cc => cc.Semester)
+                    .DefaultIfEmpty(0)
+                    .Max();
+                var minSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Select(cc => cc.Semester)
+                    .DefaultIfEmpty(0)
+                    .Min();
+
+                int slowBy = g.Semester - maxSemester;
+                int fastBy = minSemester - g.Semester;
+
+                bool isSlowStudy = slowBy > 0;
+                bool isFastStudy = fastBy > 0;
+
+
+                return new
+                {
+                    userId = g.UserId,
+                    curriculumId = g.CurriculumId,
+                    semester = g.Semester,
+                    grade = g.Grade,
+                    ispass = g.IsPassed,
+                    status = isSlowStudy
+                ? $"Slow study by {slowBy} semesters"
+                : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
+                };
+            });
+            return Ok(new
+            {
+                results = result,
+                status = StatusCodes.Status200OK
+            });
+        }
 
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetGradeByUserId(int userId)
@@ -251,7 +254,7 @@ namespace FOMSOData.Controllers
         public async Task<IActionResult> ImportCsv(IFormFile file)
         {
             if (file == null || file.Length == 0)
-                return BadRequest(new { message = "File is empty or missing." });
+          return BadRequest(new { message = "File is empty or missing." });
 
             using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
             using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
@@ -262,7 +265,7 @@ namespace FOMSOData.Controllers
                 var (missingUserIds, missingCurriculumIds) = await studentGradeRepository.ImportStudentGrades(records);
 
                 if (missingUserIds.Count > 0 || missingCurriculumIds.Count > 0)
-                {
+          {
                     return BadRequest(new
                     {
                         message = "Some UserId or CurriculumId does not exist!",
@@ -274,8 +277,5 @@ namespace FOMSOData.Controllers
                 return Ok(new { message = "Student Grades CSV imported successfully!", count = records.Count });
             }
         }
-
-
-
     }
 }

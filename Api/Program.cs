@@ -1,15 +1,12 @@
 using BusinessObject;
 using FOMSOData;
-using Microsoft.AspNetCore.OData;
-using Microsoft.OData.ModelBuilder;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Services;
 using FOMSOData.Middleware;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
-using System.Net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.OData;
+using Microsoft.IdentityModel.Tokens;
+using Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -26,7 +23,7 @@ builder.Services.AddScoped<JWTService>();
 
 builder.Services.AddControllers();
 builder.Services.AddControllers().AddOData(
-    o => o.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents("odata",EDMModelBuilder.GetEdmModel())
+    o => o.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents("odata", EDMModelBuilder.GetEdmModel())
     );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -13,7 +13,7 @@ namespace BusinessObject
         //public int Id { get; set; }
         public int CohortCurriculumId { get; set; }
 
-        public string Cohort { get; set; }
+        public string? Cohort { get; set; }
         public int CurriculumId { get; set; }
         public int Semester { get; set; }
         public Curriculum? Curriculum { get; set; }

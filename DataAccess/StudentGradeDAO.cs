@@ -108,30 +108,53 @@ namespace DataAccess
             List<int> missingUserIds = new List<int>();
             List<int> missingCurriculumIds = new List<int>();
 
+            var existingGrades = await _context.StudentGrades
+                .Where(g => grades.Select(sg => sg.UserId).Contains(g.UserId) && grades.Select(sg => sg.CurriculumId).Contains(g.CurriculumId))
+                .ToListAsync();
+
+            var gradesToUpdate = new List<StudentGrade>();
+            var gradesToAdd = new List<StudentGrade>();
+
             foreach (var grade in grades)
             {
                 if (!existingUserIds.Contains(grade.UserId))
                 {
                     missingUserIds.Add(grade.UserId);
+                    continue;
                 }
+
                 if (!existingCurriculumIds.Contains(grade.CurriculumId))
                 {
                     missingCurriculumIds.Add(grade.CurriculumId);
+                    continue;
+                }
+
+                var existingGrade = existingGrades.FirstOrDefault(g => g.UserId == grade.UserId && g.CurriculumId == grade.CurriculumId);
+                if (existingGrade != null)
+                {
+                    existingGrade.Grade = grade.Grade;
+                    existingGrade.Semester = grade.Semester;
+                    gradesToUpdate.Add(existingGrade);
+                }
+                else
+                {
+                    gradesToAdd.Add(grade);
                 }
             }
 
-            if (missingUserIds.Count > 0 || missingCurriculumIds.Count > 0)
+            if (gradesToUpdate.Any())
             {
-                return (missingUserIds, missingCurriculumIds); // ✅ Trả về danh sách lỗi riêng biệt
+                _context.StudentGrades.UpdateRange(gradesToUpdate);
             }
 
-            await _context.StudentGrades.AddRangeAsync(grades);
+            if (gradesToAdd.Any())
+            {
+                await _context.StudentGrades.AddRangeAsync(gradesToAdd);
+            }
+
             await _context.SaveChangesAsync();
 
-            return (new List<int>(), new List<int>()); // ✅ Trả về rỗng nếu thành công
+            return (missingUserIds, missingCurriculumIds);
         }
-
-
-
     }
 }

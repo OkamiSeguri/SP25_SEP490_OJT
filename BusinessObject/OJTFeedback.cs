@@ -12,9 +12,9 @@ namespace BusinessObject
         [Key]
         public int FeedbackId { get; set; }
         public int OJTId { get; set; }
-        public string GivenBy { get; set; }
-        public string Content { get; set; }
+        public string? GivenBy { get; set; }
+        public string? Content { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public OJTRegistration OJTRegistration { get; set; }
+        public OJTRegistration? OJTRegistration { get; set; }
     }
 }
