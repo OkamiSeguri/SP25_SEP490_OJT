@@ -1,0 +1,16 @@
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\bin\Release\net8.0\DataAccess.deps.json
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\bin\Release\net8.0\DataAccess.dll
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\bin\Release\net8.0\DataAccess.pdb
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\bin\Release\net8.0\BusinessObject.dll
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\bin\Release\net8.0\BusinessObject.pdb
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.csproj.AssemblyReference.cache
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.AssemblyInfoInputs.cache
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.AssemblyInfo.cs
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.csproj.CoreCompileInputs.cache
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.sourcelink.json
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.csproj.Up2Date
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.dll
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\refint\DataAccess.dll
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\DataAccess.pdb
+E:\FPT\Summer25\backend_ojt\SP25_SEP490_OJT\DataAccess\obj\Release\net8.0\ref\DataAccess.dll
