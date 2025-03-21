@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FOMSOData")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+92cc3421406406c00ab1de7b92c3fadbc5e3e346")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a37cd7df7c51aa22334ab146785833823af0d754")]
 [assembly: System.Reflection.AssemblyProductAttribute("FOMSOData")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FOMSOData")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
