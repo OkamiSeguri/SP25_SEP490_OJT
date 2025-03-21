@@ -9,5 +9,10 @@
   <ItemGroup>
     <ProjectReference Include="..\BusinessObject\BusinessObject.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
