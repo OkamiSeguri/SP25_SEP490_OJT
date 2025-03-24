@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy ASP.Net Core app to Azure Web App - my-webapp-api
 
 on:
@@ -10,31 +13,27 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read # Required for actions/checkout
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
-
-      - name: Restore dependencies
-        run: dotnet restore ${{ github.workspace }}/Api/FOMSOData.csproj
+          dotnet-version: '3.1'
 
       - name: Build with dotnet
-        run: dotnet build ${{ github.workspace }}/Api/FOMSOData.csproj --configuration Release --no-restore
+        run: dotnet build --configuration Release
 
-      - name: Publish API Project
-        run: dotnet publish ${{ github.workspace }}/Api/FOMSOData.csproj -c Release -o ${{ github.workspace }}/myapp
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{ github.workspace }}/myapp
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: windows-latest
@@ -43,22 +42,21 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # Required for requesting the JWT
-      contents: read # Required for actions/checkout
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-          path: myapp
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0DCC49F2FB3D49A8967C835563A7A0D0 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6C41E2E6D0DD4B04A580FEA9C9A3B079 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A5ED7118743A48F2902014AA48D74C30 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E98ADB00CD7D4CE59BD16CB5C7CD6967 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C40A31A786404A169FF801192D6CED69 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1CFF947C8F544E76B0ED8BE8687E5D12 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -66,4 +64,5 @@ jobs:
         with:
           app-name: 'my-webapp-api'
           slot-name: 'Production'
-          package: myapp
+          package: .
+          
