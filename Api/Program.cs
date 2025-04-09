@@ -67,11 +67,17 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Add logging
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Starting FPT OJT Web API...");
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "FPT OJT Web API V1");
+    c.RoutePrefix = "swagger";
+    logger.LogInformation("Swagger UI configured at /swagger");
+});
 
 app.UseRouting();
 app.UseAuthentication();
