@@ -19,7 +19,7 @@ using FOMSOData.Services;
 
 namespace FOMSOData.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
 
     public class UserController : ControllerBase
@@ -28,13 +28,6 @@ namespace FOMSOData.Controllers
         private readonly JWTService jwtService;
         private readonly IConfiguration _configuration;
 
-
-        public UserController(  JWTService jwtService, IConfiguration configuration)
-        {
-            userRepository = new UserRepository();
-            _configuration = configuration;
-            this.jwtService = jwtService;
-        }
         // GET: api/<UserController>
         [CustomAuthorize("3")]
         [HttpGet("admin")]

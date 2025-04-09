@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\Da
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repositories", "Repositories\Repositories.csproj", "{60B8E945-00E9-4F25-A321-4324B51CA29B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOMSOData", "Api\FOMSOData.csproj", "{120A4E77-9C75-48D2-B768-72414AC1C508}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FOMS_API", "Api\FOMS_API.csproj", "{120A4E77-9C75-48D2-B768-72414AC1C508}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

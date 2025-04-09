@@ -15,7 +15,7 @@ using System.Text;
 
 namespace FOMSOData.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     [CustomAuthorize("1")]
 

@@ -1,30 +1,42 @@
 using BusinessObject;
-using FOMSOData;
-using FOMSOData.Middleware;
+using DataAccess;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Repositories;
 using Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"];
 
-builder.Services.AddScoped(typeof(ApplicationDbContext));
+// Dependency Injection
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+//
+builder.Services.AddScoped<ICohortCurriculumRepository, CohortCurriculumRepository>();
+builder.Services.AddScoped<ICurriculumRepository, CurriculumRepository>();
+builder.Services.AddScoped<IEnterpriseRepository, EnterpriseRepository>();
+builder.Services.AddScoped<IOJTFeedbackRepository, OJTFeedbackRepository>();
+builder.Services.AddScoped<IOJTProgramRepository, OJTProgramRepository>();
+builder.Services.AddScoped<IOJTRegistrationRepository, OJTRegistrationRepository>();
+builder.Services.AddScoped<IOJTResultRepository, OJTResultRepository>();
+builder.Services.AddScoped<IStudentGradeRepository, StudentGradeRepository>();
+builder.Services.AddScoped<IStudentProfileRepository, StudentProfileRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+//
 builder.Services.AddScoped<JWTService>();
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
+// RESTful Controller
 builder.Services.AddControllers();
-builder.Services.AddControllers().AddOData(
-    o => o.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents("odata", EDMModelBuilder.GetEdmModel())
-);
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -42,20 +54,18 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]))
     };
 })
 .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
 {
-    IConfigurationSection googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
-    options.ClientId = googleAuthSection["ClientId"];
-    options.ClientSecret = googleAuthSection["ClientSecret"];
+    var googleAuth = builder.Configuration.GetSection("Authentication:Google");
+    options.ClientId = googleAuth["ClientId"];
+    options.ClientSecret = googleAuth["ClientSecret"];
     options.CallbackPath = "/signin-google";
 });
 
 var app = builder.Build();
-
-app.UseMiddleware<ErrorHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -63,15 +73,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseODataBatching();
 app.UseRouting();
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
+    endpoints.MapGet("/", () => "FPT OJT Web API is running");
     endpoints.MapFallback(() => Results.NotFound());
 });
 

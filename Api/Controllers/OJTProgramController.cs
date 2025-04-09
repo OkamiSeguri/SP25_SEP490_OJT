@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FOMSOData.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     [CustomAuthorize("3")]
     public class OJTProgramController : ControllerBase

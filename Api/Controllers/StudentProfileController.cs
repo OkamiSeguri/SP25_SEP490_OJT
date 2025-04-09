@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace FOMSOData.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     [CustomAuthorize("1")]
 
@@ -23,6 +23,7 @@ namespace FOMSOData.Controllers
             this.jwtService = jwtService;
 
         }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentProfile>>> Get()
         {

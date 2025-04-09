@@ -6,7 +6,7 @@ using Repositories;
 
 namespace FOMSOData.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EnterpriseController : ControllerBase
     {
