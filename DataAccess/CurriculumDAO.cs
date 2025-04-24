@@ -18,6 +18,18 @@ namespace DataAccess
         {
             var curriculum = await _context.Curriculums.FirstOrDefaultAsync(c => c.CurriculumId == id);
             if (curriculum == null) return null; return curriculum;
+        }     
+        public async Task<Curriculum> GetCurriculumBySubjectCode(string sc)
+        {
+            var curriculum = await _context.Curriculums.FirstOrDefaultAsync(c => c.SubjectCode == sc);
+            if (curriculum == null) return null; return curriculum;
+        }
+        public async Task<List<Curriculum>> GetCurriculumBySubjectCodeList(List<string> subjectCodes)
+        {
+            return await _context.Curriculums
+                .Where(c => subjectCodes.Contains(c.SubjectCode))
+                .AsNoTracking() 
+                .ToListAsync();
         }
         public async Task Create(Curriculum curriculum)
         {
@@ -54,13 +66,11 @@ namespace DataAccess
             {
                 if (existingIds.Contains(curriculum.CurriculumId))
                 {
-                    // ✅ CurriculumId đã tồn tại → Ghi đè
                     var existingCurriculum = await _context.Curriculums.FindAsync(curriculum.CurriculumId);
                     _context.Entry(existingCurriculum).CurrentValues.SetValues(curriculum);
                 }
                 else
                 {
-                    // ✅ CurriculumId không tồn tại → Kiểm tra SubjectCode
                     if (existingSubjectCodes.Contains(curriculum.SubjectCode))
                     {
                         duplicateSubjectCodes.Add(curriculum.SubjectCode); 

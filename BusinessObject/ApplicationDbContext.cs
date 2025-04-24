@@ -21,18 +21,21 @@ namespace BusinessObject
         public virtual DbSet<Enterprise> Enterprises { get; set; }
         public DbSet<OJTProgram> OJTPrograms { get; set; }
         public virtual DbSet<OJTRegistration> OJTRegistrations { get; set; }
+        public virtual DbSet<OJTCondition> OJTConditions { get; set; }
         public virtual DbSet<OJTResult> OJTResults { get; set; }
         public virtual DbSet<OJTFeedback> OJTFeedbacks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CohortCurriculum>()
-             .HasKey(cc => new { cc.CohortCurriculumId});
+                .HasIndex(cc => new { cc.Cohort, cc.CurriculumId })
+                .IsUnique();
 
             modelBuilder.Entity<StudentProfile>()
-           .HasOne(sp => sp.CohortCurriculum)
-           .WithMany(cc => cc.StudentProfiles)
-           .HasForeignKey(sp => sp.CohortCurriculumId);
+                .HasOne(sp => sp.CohortCurriculum)
+                .WithMany(cc => cc.StudentProfiles)
+                .HasForeignKey(sp => new { sp.Cohort, sp.CurriculumId })
+                .HasPrincipalKey(cc => new { cc.Cohort, cc.CurriculumId });
 
             modelBuilder.Entity<StudentProfile>()
         .HasOne(s => s.User)

@@ -16,7 +16,9 @@ namespace Repositories
         Task Create(StudentGrade studentGrade);
         Task Update(StudentGrade studentGrade);
         Task Delete(int UserId, int CurriculumId);
+        Task DeleteByUserId(int userId);
         Task<(List<int> MissingUserIds, List<int> MissingCurriculumIds)> ImportStudentGrades(IEnumerable<StudentGrade> studentGrade);
+        Task CreateMultiple(IEnumerable<StudentGrade> studentGrades);
 
     }
 }

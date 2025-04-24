@@ -18,6 +18,14 @@ namespace Repositories
         public async Task<User> GetUserById(int id)
         {
             return await UserDAO.Instance.GetUserById(id);
+        }       
+        public async Task<User> GetUserByMSSV(string mssv)
+        {
+            return await UserDAO.Instance.GetUserByMSSV(mssv);
+        }
+        public async Task<List<User>> GetUserByMSSVList(List<string> mssvList)
+        {
+            return await UserDAO.Instance.GetUserByMSSVList(mssvList);
         }
         public async Task<User> GetUserByEmail(string Email)
         {
@@ -53,7 +61,12 @@ namespace Repositories
             return await UserDAO.Instance.GetUserByEmailAndPassword(email, password);
         }
 
-    
+        public async Task<(List<string> DuplicateMSSVs, List<string> DuplicateEmails)> ImportUsersAsync(IEnumerable<User> user)
+        {
+            return await UserDAO.Instance.ImportUsersAsync(user);
+        }
+
+
 
     }
 }

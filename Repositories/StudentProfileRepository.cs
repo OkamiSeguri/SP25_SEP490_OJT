@@ -1,5 +1,6 @@
 ﻿using BusinessObject;
 using DataAccess;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,14 @@ namespace Repositories
         public async Task<StudentProfile> GetStudentProfileById(int id)
         {
             return await StudentProfileDAO.Instance.GetStudentProfileById(id);
+        }
+        public async Task<List<StudentProfile>> GetStudentProfilesByUserIds(List<int> userIds)
+        {
+            return await StudentProfileDAO.Instance.GetStudentProfilesByUserIds(userIds);
+        }
+        public async Task<StudentProfile> GetStudentProfileByUserId(int id)
+        {
+            return await StudentProfileDAO.Instance.GetStudentProfileByUserId(id);
         }     
 
         public async Task Create(StudentProfile studentProfile)
@@ -36,6 +45,11 @@ namespace Repositories
         {
             await StudentProfileDAO.Instance.Delete(id);
         }
+        public async Task DeleteByUserId(int UserId)
+        {
+            await StudentProfileDAO.Instance.DeleteByUserId(UserId);
+
+        }
         public async Task<IEnumerable<Curriculum>> GetMandatorySubjectsAsync(int userId)
         {
             return await StudentProfileDAO.Instance.GetMandatorySubjectsAsync(userId);
@@ -44,6 +58,10 @@ namespace Repositories
         public async Task<IEnumerable<Curriculum>> GetFailedMandatorySubjectsAsync(int userId)
         {
             return await StudentProfileDAO.Instance.GetFailedMandatorySubjectsAsync(userId);
+        }
+        public async Task<(List<int> MissingUserIds, List<string> MissingCohorts)> ImportStudentProfilesAsync(IEnumerable<StudentProfile> studentProfiles)
+        {
+            return await StudentProfileDAO.Instance.ImportStudentProfilesAsync(studentProfiles);
         }
     }
 }

@@ -11,6 +11,9 @@ namespace Repositories
     {
         Task<IEnumerable<Curriculum>> GetCurriculumAll();
         Task<Curriculum> GetCurriculumById(int id);
+        Task<Curriculum> GetCurriculumBySubjectCode(string sc);
+        Task<List<Curriculum>> GetCurriculumBySubjectCodeList(List<string> subjectCodes);
+
         Task Create(Curriculum curriculum);
         Task Update(Curriculum curriculum);
         Task Delete(int id);

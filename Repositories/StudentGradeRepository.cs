@@ -41,10 +41,15 @@ namespace Repositories
             await UpdateStudentCredits(studentGrade.UserId);
         }
 
-        public async Task Delete(int UserId, int CurriculumId)
+        public async Task Delete(int UserId, int CurriculumId)  
         {
             await StudentGradeDAO.Instance.Delete(UserId, CurriculumId);
             await UpdateStudentCredits(UserId);
+
+        }
+        public async Task DeleteByUserId(int UserId)
+        {
+            await StudentGradeDAO.Instance.DeleteByUserId(UserId);
 
         }
 
@@ -53,6 +58,10 @@ namespace Repositories
             return await StudentGradeDAO.Instance.ImportStudentGradesAsync(grades);
         }
 
+        public async Task CreateMultiple(IEnumerable<StudentGrade> studentGrades)
+        {
+            await StudentGradeDAO.Instance.CreateMultiple(studentGrades);
+        }
 
 
     }

@@ -15,7 +15,7 @@ using System.Text;
 
 namespace FOMSOData.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     [CustomAuthorize("1")]
 
@@ -129,7 +129,7 @@ namespace FOMSOData.Controllers
 
 
         [HttpPost("import")]
-        public async Task<IActionResult> ImportCsv(IFormFile file)
+        public async Task<IActionResult> ImportCurriculumCsv(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "File is empty or missing." });
@@ -138,11 +138,59 @@ namespace FOMSOData.Controllers
             using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
             {
                 csv.Context.RegisterClassMap<CurriculumMap>();
-                var records = csv.GetRecords<Curriculum>().ToList();
+                csv.Read();
+                csv.ReadHeader();
+                var requiredHeaders = new List<string> { "SubjectCode", "SubjectName" };
+                var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
+
+                if (missingHeaders.Any())
+                {
+                    return BadRequest(new
+                    {
+                        message = "CSV file is missing required columns!",
+                        missingColumns = missingHeaders
+                    });
+                }
+
+                var records = new List<Curriculum>();
+                var invalidRows = new List<int>();
+                int rowIndex = 1;
+
+                while (csv.Read())
+                {
+                    bool isValid = true;
+                    if (!csv.TryGetField("SubjectCode", out string subjectCode) || string.IsNullOrWhiteSpace(subjectCode))
+                        isValid = false;
+                    if (!csv.TryGetField("SubjectName", out string subjectName) || string.IsNullOrWhiteSpace(subjectName))
+                        isValid = false;
+
+                    if (!isValid)
+                    {
+                        invalidRows.Add(rowIndex);
+                        rowIndex++;
+                        continue;
+                    }
+
+                    records.Add(new Curriculum
+                    {
+                        SubjectCode = subjectCode.Trim(),
+                        SubjectName = subjectName.Trim()
+                    });
+
+                    rowIndex++;
+                }
+
+                if (invalidRows.Any())
+                {
+                    return BadRequest(new
+                    {
+                        message = "Some rows have missing required fields!",
+                        invalidRows = invalidRows
+                    });
+                }
 
                 var duplicateSubjectCodes = await curriculumRepository.ImportCurriculums(records);
-
-                if (duplicateSubjectCodes.Count > 0) 
+                if (duplicateSubjectCodes.Count > 0)
                 {
                     return BadRequest(new
                     {
@@ -154,6 +202,7 @@ namespace FOMSOData.Controllers
                 return Ok(new { message = "Curriculum CSV imported successfully!", count = records.Count });
             }
         }
+
 
 
     }

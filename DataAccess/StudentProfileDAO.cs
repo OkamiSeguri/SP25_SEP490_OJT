@@ -23,13 +23,39 @@ namespace DataAccess
         {
             var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.StudentId == id);
             if (studentProfile == null) return null; return studentProfile;
-        }      
+        }
+
+
+        public async Task<List<StudentProfile>> GetStudentProfilesByUserIds(List<int> userIds)
+        {
+            return await _context.StudentProfiles
+                                 .Where(sp => userIds.Contains(sp.UserId))
+                                 .ToListAsync();
+        }
+
+        public async Task<StudentProfile> GetStudentProfileByUserId(int id)
+        {
+            var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.UserId == id);
+            if (studentProfile == null) return null; return studentProfile;
+        }
 
         public async Task Create(StudentProfile studentProfile)
         {
+            var cohortCurriculum = await _context.CohortCurriculums
+                .Where(cc => cc.Cohort == studentProfile.Cohort)
+                .OrderBy(cc => cc.CurriculumId) 
+                .FirstOrDefaultAsync();
+
+            if (cohortCurriculum == null)
+            {
+                throw new Exception($"Không tìm thấy CurriculumId cho Cohort {studentProfile.Cohort}");
+            }
+
+            studentProfile.CurriculumId = cohortCurriculum.CurriculumId;
             await _context.StudentProfiles.AddAsync(studentProfile);
             await _context.SaveChangesAsync();
         }
+
         public async Task Update(StudentProfile studentProfile)
         {
             var existingItem = await GetStudentProfileById(studentProfile.StudentId);
@@ -48,6 +74,12 @@ namespace DataAccess
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task DeleteByUserId(int userId)
+        {
+            var studentProfile = _context.StudentProfiles.Where(g => g.UserId == userId);
+            _context.StudentProfiles.RemoveRange(studentProfile);
+            await _context.SaveChangesAsync();
+        }
         public async Task<IEnumerable<Curriculum>> GetMandatorySubjectsAsync(int userId)
         {
             return await _context.Curriculums
@@ -62,6 +94,68 @@ namespace DataAccess
                 .Select(sg => sg.Curriculum)
                 .ToListAsync();
         }
+        public async Task<(List<int> MissingStudentIds, List<string> MissingCohorts)> ImportStudentProfilesAsync(IEnumerable<StudentProfile> profiles)
+        {
+            var existingStudentIds = await _context.Users.Select(u => u.UserId).ToHashSetAsync();
+            var existingCohorts = await _context.CohortCurriculums
+                .Select(c => new { c.Cohort, c.CurriculumId })
+                .ToListAsync();
+
+            var cohortDict = existingCohorts
+                .GroupBy(c => c.Cohort)
+                .ToDictionary(g => g.Key, g => g.First().CurriculumId);
+
+            List<int> missingStudentIds = new List<int>();
+            List<string> missingCohorts = new List<string>();
+
+            var existingProfiles = await _context.StudentProfiles
+                .Where(p => profiles.Select(sp => sp.StudentId).Contains(p.StudentId))
+                .ToDictionaryAsync(p => p.StudentId);
+
+            var profilesToAdd = new List<StudentProfile>();
+
+            foreach (var profile in profiles)
+            {
+                if (!existingStudentIds.Contains(profile.UserId))
+                {
+                    missingStudentIds.Add(profile.UserId);
+                    continue;
+                }
+
+                if (!cohortDict.TryGetValue(profile.Cohort, out var curriculumId))
+                {
+                    missingCohorts.Add(profile.Cohort);
+                    continue;
+                }
+
+                profile.CurriculumId = curriculumId;
+
+                if (existingProfiles.TryGetValue(profile.StudentId, out var existingProfile))
+                {
+                    _context.Entry(existingProfile).State = EntityState.Detached;
+
+                    existingProfile.Cohort = profile.Cohort;
+                    existingProfile.CurriculumId = profile.CurriculumId;
+                    _context.StudentProfiles.Attach(existingProfile);
+                    _context.Entry(existingProfile).State = EntityState.Modified;
+                }
+                else
+                {
+                    profilesToAdd.Add(profile);
+                }
+            }
+
+            if (profilesToAdd.Any())
+            {
+                await _context.StudentProfiles.AddRangeAsync(profilesToAdd);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return (missingStudentIds, missingCohorts);
+        }
+
+
 
     }
 }

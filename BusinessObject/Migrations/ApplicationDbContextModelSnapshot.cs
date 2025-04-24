@@ -32,7 +32,7 @@ namespace BusinessObject.Migrations
 
                     b.Property<string>("Cohort")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("CurriculumId")
                         .HasColumnType("int");
@@ -43,6 +43,9 @@ namespace BusinessObject.Migrations
                     b.HasKey("CohortCurriculumId");
 
                     b.HasIndex("CurriculumId");
+
+                    b.HasIndex("Cohort", "CurriculumId")
+                        .IsUnique();
 
                     b.ToTable("CohortCurriculums");
                 });
@@ -83,19 +86,15 @@ namespace BusinessObject.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("EnterpriseId"));
 
                     b.Property<string>("ContactEmail")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("ContactPhone")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Industry")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
@@ -107,6 +106,27 @@ namespace BusinessObject.Migrations
                         .IsUnique();
 
                     b.ToTable("Enterprises");
+                });
+
+            modelBuilder.Entity("BusinessObject.OJTCondition", b =>
+                {
+                    b.Property<int>("ConditionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ConditionId"));
+
+                    b.Property<string>("ConditionKey")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConditionValue")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("ConditionId");
+
+                    b.ToTable("OJTConditions");
                 });
 
             modelBuilder.Entity("BusinessObject.OJTFeedback", b =>
@@ -147,7 +167,6 @@ namespace BusinessObject.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ProgramId"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("EndDate")
@@ -157,15 +176,16 @@ namespace BusinessObject.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ProgramName")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Requirements")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("longtext");
 
                     b.HasKey("ProgramId");
 
@@ -188,14 +208,16 @@ namespace BusinessObject.Migrations
                     b.Property<int>("ProgramId")
                         .HasColumnType("int");
 
+                    b.Property<int>("RegistrationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("OJTId");
@@ -218,10 +240,12 @@ namespace BusinessObject.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("OJTId"));
 
                     b.Property<string>("Comments")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("OJTRegistrationOJTId")
+                    b.Property<int?>("OJTRegistrationOJTId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ResultId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Score")
@@ -243,9 +267,9 @@ namespace BusinessObject.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Grade")
-                        .HasColumnType("decimal(65,30)");
+                        .HasColumnType("decimal(4,2)");
 
-                    b.Property<int>("IsPassed")
+                    b.Property<int?>("IsPassed")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("int")
                         .HasComputedColumnSql("CASE WHEN Grade >= 5.0 THEN 1 ELSE 0 END");
@@ -268,7 +292,11 @@ namespace BusinessObject.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("StudentId"));
 
-                    b.Property<int>("CohortCurriculumId")
+                    b.Property<string>("Cohort")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("CurriculumId")
                         .HasColumnType("int");
 
                     b.Property<int?>("DebtCredits")
@@ -282,10 +310,10 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("StudentId");
 
-                    b.HasIndex("CohortCurriculumId");
-
                     b.HasIndex("UserId")
                         .IsUnique();
+
+                    b.HasIndex("Cohort", "CurriculumId");
 
                     b.ToTable("StudentProfiles");
                 });
@@ -304,6 +332,9 @@ namespace BusinessObject.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MSSV")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Password")
@@ -378,9 +409,7 @@ namespace BusinessObject.Migrations
 
                     b.HasOne("BusinessObject.User", "User")
                         .WithMany("OJTRegistration")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Enterprise");
 
@@ -393,9 +422,7 @@ namespace BusinessObject.Migrations
                 {
                     b.HasOne("BusinessObject.OJTRegistration", "OJTRegistration")
                         .WithMany("OJTResults")
-                        .HasForeignKey("OJTRegistrationOJTId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OJTRegistrationOJTId");
 
                     b.Navigation("OJTRegistration");
                 });
@@ -421,16 +448,17 @@ namespace BusinessObject.Migrations
 
             modelBuilder.Entity("BusinessObject.StudentProfile", b =>
                 {
-                    b.HasOne("BusinessObject.CohortCurriculum", "CohortCurriculum")
-                        .WithMany("StudentProfiles")
-                        .HasForeignKey("CohortCurriculumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BusinessObject.User", "User")
                         .WithOne("StudentProfile")
                         .HasForeignKey("BusinessObject.StudentProfile", "UserId")
                         .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("BusinessObject.CohortCurriculum", "CohortCurriculum")
+                        .WithMany("StudentProfiles")
+                        .HasForeignKey("Cohort", "CurriculumId")
+                        .HasPrincipalKey("Cohort", "CurriculumId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CohortCurriculum");

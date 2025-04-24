@@ -1,8 +1,5 @@
 ﻿using BusinessObject;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Repositories
@@ -10,12 +7,12 @@ namespace Repositories
     public interface ICohortCurriculumRepository
     {
         Task<IEnumerable<CohortCurriculum>> GetCohortCurriculumAll();
-        Task<CohortCurriculum> GetCohortCurriculum(int cohortcurriculumId);
+        Task<CohortCurriculum> GetCohortCurriculum(string cohort, int curriculumId);
+        Task<List<CohortCurriculum>> GetCohortCurriculumByCohort(List<string> cohort);
+
         Task Create(CohortCurriculum cohortCurriculum);
         Task Update(CohortCurriculum cohortCurriculum);
-        Task Delete(int cohortcurriculumId);
+        Task Delete(string cohort, int curriculumId);
         Task ImportCohortCurriculum(IEnumerable<CohortCurriculum> cohortCurriculum);
-
     }
 }
-

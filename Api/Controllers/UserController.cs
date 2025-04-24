@@ -15,12 +15,15 @@ using Google.Apis.Auth;
 using System.Text;
 using System.Security.Cryptography;
 using FOMSOData.Services;
-
+using FOMSOData.Mappings;
+using System.Globalization;
+using CsvHelper;
+using FOMSOData.Mappings;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FOMSOData.Controllers
 {
-    [Route("odata/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
 
     public class UserController : ControllerBase
@@ -61,6 +64,7 @@ namespace FOMSOData.Controllers
                 {
                     id = u.UserId,
                     fullname = u.FullName,
+                    mssv = u.MSSV,
                     email = u.Email,
                     password = u.Password,
                     role = u.Role
@@ -92,6 +96,7 @@ namespace FOMSOData.Controllers
                     {
                         id = u.UserId,
                         fullname = u.FullName,
+                        mssv = u.MSSV,
                         email = u.Email,
                     }),
                     status = StatusCodes.Status200OK
@@ -137,6 +142,7 @@ namespace FOMSOData.Controllers
                     {
                         id = user.UserId,
                         fullname = user.FullName,
+                        mssv = user.MSSV,
                         email = user.Email,
 
                     },
@@ -173,6 +179,7 @@ namespace FOMSOData.Controllers
                     {
                         id = user.UserId,
                         fullname = user.FullName,
+                        mssv = user.MSSV,
                         email = user.Email,
                         password = user.Password, 
                         role = user.Role
@@ -183,7 +190,7 @@ namespace FOMSOData.Controllers
 
         // POST api/<UserController>
         [CustomAuthorize("3")]
-        [HttpPost]
+        [HttpPost("staff")]
         public async Task<ActionResult> Post([FromBody] User user)
         {
 
@@ -203,14 +210,42 @@ namespace FOMSOData.Controllers
                     {
                         id = user.UserId,
                         name = user.FullName,
+                        mssv = user.MSSV,
                         email = user.Email,
                         password = user.Password,
-                        role = user.Role
                     },
                     status = StatusCodes.Status200OK
                 });
             }
+        [CustomAuthorize("1")]
+        [HttpPost]
+        public async Task<ActionResult> PostForStaff([FromBody] User user)
+        {
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    code = StatusCodes.Status400BadRequest,
+                    detail = "Invalid request data."
+                });
+            }
+            await userRepository.Create(user);
+
+            return Ok(new
+            {
+                results = new
+                {
+                    id = user.UserId,
+                    name = user.FullName,
+                    email = user.Email,
+                    mssv = user.MSSV,
+                    password = user.Password,
+                    role = 0
+                },
+                status = StatusCodes.Status200OK
+            });
+        }
         // PUT api/<UserController>/5
         [CustomAuthorize("3")]
         [HttpPut("{id}")]
@@ -325,39 +360,103 @@ namespace FOMSOData.Controllers
                 var user = await userRepository.GetUserByEmail(payload.Email);
                 if (user == null)
                 {
-                    string randomPassword = PasswordService.GenerateRandomPassword(12);
-                    string hashedPassword = PasswordService.HashPassword(randomPassword);
-
-                    user = new User
-                    {
-                        FullName = payload.Name,
-                        Email = payload.Email,
-                        Password = hashedPassword, 
-                        Role = 0 
-                    };
-
-                    await userRepository.Create(user);
-                }
+                return Unauthorized(new
+                {
+                    message = "You don't have permission to access the system"
+                });
+            }
 
                 var accessToken = jwtService.GenerateToken(user);
 
                 return Ok(new
                 {
                     token = accessToken,
-                    user = new
-                    {
-                        id = user.UserId,
-                        name = user.FullName,
-                        email = user.Email,
-                        role = user.Role
 
-                    }
                 });
+        }
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportUsersCsv(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "File is empty or missing." });
+
+            using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
+            using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
+            {
+                csv.Context.RegisterClassMap<UserMap>();
+                var requiredHeaders = new List<string> { "MSSV", "FullName", "Email", "Password" };
+                csv.Read();
+                csv.ReadHeader();
+                var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
+
+                if (missingHeaders.Any())
+                {
+                    return BadRequest(new
+                    {
+                        message = "CSV file is missing required columns!",
+                        missingColumns = missingHeaders
+                    });
+                }
+                var records = new List<User>();
+                var invalidRows = new List<int>();
+                int rowIndex = 1; // Bắt đầu từ dòng 1 (bỏ qua header)
+
+                while (csv.Read())
+                {
+                    var user = new User();
+                    bool isValid = true;
+
+                    if (!csv.TryGetField("MSSV", out string mssv) || string.IsNullOrWhiteSpace(mssv))
+                        isValid = false;
+                    if (!csv.TryGetField("FullName", out string fullName) || string.IsNullOrWhiteSpace(fullName))
+                        isValid = false;
+                    if (!csv.TryGetField("Email", out string email) || string.IsNullOrWhiteSpace(email))
+                        isValid = false;
+                    if (!csv.TryGetField("Password", out string password) || string.IsNullOrWhiteSpace(password))
+                        isValid = false;
+
+                    if (!isValid)
+                    {
+                        invalidRows.Add(rowIndex);
+                        rowIndex++;
+                        continue;
+                    }
+
+                    records.Add(new User
+                    {
+                        MSSV = mssv.Trim(),
+                        FullName = fullName.Trim(),
+                        Email = email.Trim(),
+                        Password = password.Trim(),
+                    });
+
+                    rowIndex++;
+                }
+
+                if (invalidRows.Any())
+                {
+                    return BadRequest(new
+                    {
+                        message = "Some rows have missing required fields!",
+                        invalidRows = invalidRows
+                    });
+                }
+                // Kiểm tra trùng MSSV và Email
+                var (duplicateMSSVs, duplicateEmails) = await userRepository.ImportUsersAsync(records);
+
+                if (duplicateMSSVs.Count > 0 || duplicateEmails.Count > 0)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Some users already exist!",
+                        duplicateMSSVs = duplicateMSSVs,
+                        duplicateEmails = duplicateEmails
+                    });
+                }
+
+                return Ok(new { message = "Users CSV imported successfully!", count = records.Count });
             }
-
-            
-        
-
+        }
 
     }
 }

@@ -1,10 +1,6 @@
 ﻿using BusinessObject;
 using DataAccess;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Repositories
@@ -16,27 +12,34 @@ namespace Repositories
             return await CohortCurriculumDAO.Instance.GetCohortCurriculumAll();
         }
 
-        public async Task<CohortCurriculum> GetCohortCurriculum(int cohortcurriculumId)
+        public async Task<CohortCurriculum> GetCohortCurriculum(string cohort, int curriculumId)
         {
-            return await CohortCurriculumDAO.Instance.GetCohortCurriculum(cohortcurriculumId);
+            return await CohortCurriculumDAO.Instance.GetCohortCurriculum(cohort, curriculumId);
+        }       
+        public async Task<List<CohortCurriculum>> GetCohortCurriculumByCohort(List<string> cohort)
+        {
+            return await CohortCurriculumDAO.Instance.GetCohortCurriculumByCohort(cohort);
+
         }
 
         public async Task Create(CohortCurriculum cohortCurriculum)
         {
             await CohortCurriculumDAO.Instance.Create(cohortCurriculum);
         }
+
         public async Task Update(CohortCurriculum cohortCurriculum)
         {
             await CohortCurriculumDAO.Instance.Update(cohortCurriculum);
         }
-        public async Task Delete(int cohortcurriculumId)
+
+        public async Task Delete(string cohort, int curriculumId)
         {
-            await CohortCurriculumDAO.Instance.Delete(cohortcurriculumId);
+            await CohortCurriculumDAO.Instance.Delete(cohort, curriculumId);
         }
+
         public async Task ImportCohortCurriculum(IEnumerable<CohortCurriculum> cohortCurriculum)
         {
             await CohortCurriculumDAO.Instance.ImportCohortCurriculumAsync(cohortCurriculum);
         }
-
     }
 }

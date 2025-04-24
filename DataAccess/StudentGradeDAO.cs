@@ -100,6 +100,13 @@ namespace DataAccess
 
             }
         }
+        public async Task DeleteByUserId(int userId)
+        {
+            var grades = _context.StudentGrades.Where(g => g.UserId == userId);
+            _context.StudentGrades.RemoveRange(grades);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<(List<int> MissingUserIds, List<int> MissingCurriculumIds)> ImportStudentGradesAsync(IEnumerable<StudentGrade> grades)
         {
             var existingCurriculumIds = await _context.Curriculums.Select(c => c.CurriculumId).ToHashSetAsync();
@@ -108,27 +115,66 @@ namespace DataAccess
             List<int> missingUserIds = new List<int>();
             List<int> missingCurriculumIds = new List<int>();
 
+            var existingGrades = await _context.StudentGrades
+                .Where(g => grades.Select(sg => sg.UserId).Contains(g.UserId) &&
+                            grades.Select(sg => sg.CurriculumId).Contains(g.CurriculumId))
+                .ToDictionaryAsync(g => new { g.UserId, g.CurriculumId });
+
+            var gradesToAdd = new List<StudentGrade>();
+
             foreach (var grade in grades)
             {
                 if (!existingUserIds.Contains(grade.UserId))
                 {
                     missingUserIds.Add(grade.UserId);
+                    continue;
                 }
+
                 if (!existingCurriculumIds.Contains(grade.CurriculumId))
                 {
                     missingCurriculumIds.Add(grade.CurriculumId);
+                    continue;
+                }
+
+                var key = new { grade.UserId, grade.CurriculumId };
+
+                if (existingGrades.TryGetValue(key, out var existingGrade))
+                {
+                    _context.Entry(existingGrade).State = EntityState.Detached;
+
+                    existingGrade.Grade = grade.Grade;
+                    existingGrade.Semester = grade.Semester;
+
+                    _context.StudentGrades.Attach(existingGrade);
+                    _context.Entry(existingGrade).State = EntityState.Modified;
+                }
+                else
+                {
+                    gradesToAdd.Add(grade);
                 }
             }
 
-            if (missingUserIds.Count > 0 || missingCurriculumIds.Count > 0)
+            if (gradesToAdd.Any())
             {
-                return (missingUserIds, missingCurriculumIds); 
+                await _context.StudentGrades.AddRangeAsync(gradesToAdd);
             }
 
-            await _context.StudentGrades.AddRangeAsync(grades);
             await _context.SaveChangesAsync();
 
-            return (new List<int>(), new List<int>()); 
+            return (missingUserIds, missingCurriculumIds);
+        }
+
+
+        public async Task CreateMultiple(IEnumerable<StudentGrade> studentGrades)
+        {
+            await _context.StudentGrades.AddRangeAsync(studentGrades);
+            await _context.SaveChangesAsync();
+
+            var userIds = studentGrades.Select(g => g.UserId).Distinct();
+            foreach (var userId in userIds)
+            {
+                await UpdateStudentCredits(userId);
+            }
         }
 
 

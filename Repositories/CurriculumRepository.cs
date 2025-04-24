@@ -18,8 +18,15 @@ namespace Repositories
         public async Task<Curriculum> GetCurriculumById(int id)
         {
             return await CurriculumDAO.Instance.GetCurriculumById(id);
+        }       
+        public async Task<Curriculum> GetCurriculumBySubjectCode(string sc)
+        {
+            return await CurriculumDAO.Instance.GetCurriculumBySubjectCode(sc);
         }
-
+        public async Task<List<Curriculum>> GetCurriculumBySubjectCodeList(List<string> subjectCodes)
+        {
+            return await CurriculumDAO.Instance.GetCurriculumBySubjectCodeList(subjectCodes);
+        }
         public async Task Create(Curriculum curriculum)
         {
             await CurriculumDAO.Instance.Create(curriculum);
