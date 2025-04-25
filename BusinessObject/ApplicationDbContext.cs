@@ -91,7 +91,7 @@ namespace BusinessObject
             IConfigurationRoot configuration = builder.Build();
 
             optionsBuilder.UseMySql(configuration.GetConnectionString("DefaultConnection"),
-                new MySqlServerVersion(new Version(9, 0, 0))); // Thay đổi phiên bản MySQL phù hợp
+                new MySqlServerVersion(new Version(9, 0, 0))); 
         }
 
     }
