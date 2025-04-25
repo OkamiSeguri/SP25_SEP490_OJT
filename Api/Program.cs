@@ -22,14 +22,13 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "FPT OJT Web API", Version = "v1" });
 
-    // Tự động thêm "Bearer " vào Authorization header
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "Enter JWT token only. Example: 12345abcdef (no need to type 'Bearer')",
         Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http, // 👈 đổi từ ApiKey sang Http
-        Scheme = "bearer", // 👈 lưu ý: viết thường
+        Type = SecuritySchemeType.Http, 
+        Scheme = "bearer", 
         BearerFormat = "JWT"
     });
 
@@ -83,7 +82,6 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-// Add logging
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("Starting FPT OJT Web API...");
 
