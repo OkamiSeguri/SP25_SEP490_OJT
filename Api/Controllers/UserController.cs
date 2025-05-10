@@ -31,10 +31,14 @@ namespace FOMSOData.Controllers
         private readonly IUserRepository userRepository;
         private readonly JWTService jwtService;
         private readonly IConfiguration _configuration;
+        private readonly IOJTConditionRepository ojtConditionRepository;
+        private readonly IStudentProfileRepository studentProfileRepository;
 
 
-        public UserController(  JWTService jwtService, IConfiguration configuration)
+        public UserController(JWTService jwtService, IConfiguration configuration)
         {
+            studentProfileRepository = new StudentProfileRepository();
+            ojtConditionRepository = new OJTConditionRepository();
             userRepository = new UserRepository();
             _configuration = configuration;
             this.jwtService = jwtService;
@@ -73,152 +77,200 @@ namespace FOMSOData.Controllers
             });
         }
 
-        [CustomAuthorize("1","2")]
+        [CustomAuthorize("1", "2")]
         [HttpGet("staff-enter")]
         public async Task<ActionResult> GetUsersWithRole0()
         {
-
-
-                var users = await userRepository.GetUserByRole(0);
-
-                if (users == null || !users.Any())
+            var users = await userRepository.GetUserByRole(0);
+            if (users == null || !users.Any())
+            {
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        status = StatusCodes.Status404NotFound,
-                        detail = "No users with role 0 found."
-                    });
-                }
-
-                return Ok(new
-                {
-                    results = users.Select(u => new
-                    {
-                        id = u.UserId,
-                        fullname = u.FullName,
-                        mssv = u.MSSV,
-                        email = u.Email,
-                    }),
-                    status = StatusCodes.Status200OK
+                    status = StatusCodes.Status404NotFound,
+                    detail = "No users with role 0 found."
                 });
             }
 
+            var userIds = users.Select(u => u.UserId).ToList();
+            var profiles = await studentProfileRepository.GetStudentProfilesByUserIds(userIds);
+            var profileDict = profiles.ToDictionary(p => p.UserId);
 
-        [CustomAuthorize("1","2")]
+            var results = new List<object>();
+            foreach (var user in users)
+            {
+                profileDict.TryGetValue(user.UserId, out var profile);
 
-        // GET api/<UserController>/5
+                bool isEligible = false;
+                if (profile != null)
+                {
+                    isEligible = await IsEligibleForOJT(user.UserId);
+                }
+
+                results.Add(new
+                {
+                    userid = user.UserId,
+                    fullname = user.FullName,
+                    mssv = user.MSSV,
+                    email = user.Email,
+                    studentId = profile?.StudentId,
+                    cohort = profile?.Cohort,
+                    totalCredits = profile?.TotalCredits,
+                    debtCredits = profile?.DebtCredits,
+                    ojtEligible = isEligible
+                });
+            }
+
+            return Ok(new
+            {
+                results,
+                status = StatusCodes.Status200OK
+            });
+        }
+        private async Task<bool> IsEligibleForOJT(int userId)
+        {
+            var studentProfile = await studentProfileRepository.GetStudentProfileByUserId(userId);
+            if (studentProfile == null) return false;
+
+            double debtRatio = (double)studentProfile.DebtCredits.GetValueOrDefault()
+                               / studentProfile.TotalCredits.GetValueOrDefault();
+
+            var failedMandatorySubjects = await studentProfileRepository.GetFailedMandatorySubjectsAsync(userId);
+            double maxDebtRatio = await ojtConditionRepository.GetMaxDebtRatioAsync();
+            bool checkFailedSubjects = await ojtConditionRepository.ShouldCheckFailedSubjectsAsync();
+
+            if (debtRatio > maxDebtRatio) return false;
+            if (checkFailedSubjects && failedMandatorySubjects.Any()) return false;
+
+            return true;
+        }
+
+        [CustomAuthorize("1", "2")]
         [HttpGet("staff-enter/{id}")]
         public async Task<ActionResult> Get(int id)
         {
-
-                if (id <= 0)
+            if (id <= 0)
+            {
+                return BadRequest(new
                 {
-                    return BadRequest(new
-                    {
-                        code = StatusCodes.Status400BadRequest,
-                        detail = "Invalid user ID."
-                    });
-                }
-                var user = await userRepository.GetUserById(id);
-                if (user == null)
-                {
-                    return NotFound(new
-                    {
-                        code = StatusCodes.Status404NotFound,
-                        detail = "User not found."
-                    });
-                }
-                if (user.Role != 0)
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, new
-                    {
-                        code = StatusCodes.Status403Forbidden,
-                        detail = "You cannot access this user"
-                    });
-                }
-                return Ok(new
-                {
-                    result = new
-                    {
-                        id = user.UserId,
-                        fullname = user.FullName,
-                        mssv = user.MSSV,
-                        email = user.Email,
-
-                    },
-                    status = StatusCodes.Status200OK
+                    code = StatusCodes.Status400BadRequest,
+                    detail = "Invalid user ID."
                 });
             }
+
+            var user = await userRepository.GetUserById(id);
+            if (user == null)
+            {
+                return NotFound(new
+                {
+                    code = StatusCodes.Status404NotFound,
+                    detail = "User not found."
+                });
+            }
+
+            if (user.Role != 0)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    code = StatusCodes.Status403Forbidden,
+                    detail = "You do not have permission"
+                });
+            }
+
+            var profile = await studentProfileRepository.GetStudentProfileByUserId(user.UserId);
+            bool isEligible = false;
+            if (profile != null)
+            {
+                isEligible = await IsEligibleForOJT(user.UserId);
+            }
+
+            return Ok(new
+            {
+                result = new
+                {
+                    userid = user.UserId,
+                    fullname = user.FullName,
+                    mssv = user.MSSV,
+                    email = user.Email,
+                    studentId = profile?.StudentId,
+                    cohort = profile?.Cohort,
+                    totalCredits = profile?.TotalCredits,
+                    debtCredits = profile?.DebtCredits,
+                    ojtEligible = isEligible
+                },
+                status = StatusCodes.Status200OK
+            });
+        }
+
 
         [CustomAuthorize("3")]
         [HttpGet("admin/{id}")]
         public async Task<ActionResult> GetForAdmin(int id)
         {
 
-                if (id <= 0)
+            if (id <= 0)
+            {
+                return BadRequest(new
                 {
-                    return BadRequest(new
-                    {
-                        code = StatusCodes.Status400BadRequest,
-                        detail = "Invalid user ID."
-                    });
-                }      
-                var user = await userRepository.GetUserById(id);
-                if (user == null)
-                {
-                    return NotFound(new
-                    {
-                        code = StatusCodes.Status404NotFound,
-                        detail = "User not found."
-                    });
-                }
-
-                return Ok(new
-                {
-                    result = new
-                    {
-                        id = user.UserId,
-                        fullname = user.FullName,
-                        mssv = user.MSSV,
-                        email = user.Email,
-                        password = user.Password, 
-                        role = user.Role
-                    },
-                    status = StatusCodes.Status200OK
+                    code = StatusCodes.Status400BadRequest,
+                    detail = "Invalid user ID."
                 });
             }
+            var user = await userRepository.GetUserById(id);
+            if (user == null)
+            {
+                return NotFound(new
+                {
+                    code = StatusCodes.Status404NotFound,
+                    detail = "User not found."
+                });
+            }
+
+            return Ok(new
+            {
+                result = new
+                {
+                    id = user.UserId,
+                    fullname = user.FullName,
+                    mssv = user.MSSV,
+                    email = user.Email,
+                    password = user.Password,
+                    role = user.Role
+                },
+                status = StatusCodes.Status200OK
+            });
+        }
 
         // POST api/<UserController>
         [CustomAuthorize("3")]
-        [HttpPost("staff")]
+        [HttpPost]
         public async Task<ActionResult> Post([FromBody] User user)
         {
 
-                if (!ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
                 {
-                    return BadRequest(new
-                    {
-                        code = StatusCodes.Status400BadRequest,
-                        detail = "Invalid request data."
-                    });
-                }
-                await userRepository.Create(user);
-
-                return Ok(new
-                {
-                    results = new
-                    {
-                        id = user.UserId,
-                        name = user.FullName,
-                        mssv = user.MSSV,
-                        email = user.Email,
-                        password = user.Password,
-                    },
-                    status = StatusCodes.Status200OK
+                    code = StatusCodes.Status400BadRequest,
+                    detail = "Invalid request data."
                 });
             }
+            await userRepository.Create(user);
+
+            return Ok(new
+            {
+                results = new
+                {
+                    id = user.UserId,
+                    name = user.FullName,
+                    mssv = user.MSSV,
+                    email = user.Email,
+                    password = user.Password,
+                },
+                status = StatusCodes.Status200OK
+            });
+        }
         [CustomAuthorize("1")]
-        [HttpPost]
+        [HttpPost("staff")]
         public async Task<ActionResult> PostForStaff([FromBody] User user)
         {
 
@@ -246,6 +298,49 @@ namespace FOMSOData.Controllers
                 status = StatusCodes.Status200OK
             });
         }
+        [CustomAuthorize("1")]
+        [HttpPut("staff/{id}")]
+        public async Task<ActionResult> PutForStaff(int id, [FromBody] User user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    code = StatusCodes.Status400BadRequest,
+                    detail = "Invalid request data."
+                });
+            }
+
+            var exist = await userRepository.GetUserById(id);
+            if (exist == null)
+            {
+                return NotFound(new
+                {
+                    code = StatusCodes.Status404NotFound,
+                    detail = "User not found."
+                });
+            }
+
+            if (exist.Role != 0)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    code = StatusCodes.Status403Forbidden,
+                    detail = "You do not have permission"
+                });
+            }
+
+            user.UserId = id;
+            user.Role = 0; 
+            await userRepository.Update(user);
+
+            return Ok(new
+            {
+                code = StatusCodes.Status200OK,
+                detail = "Update successful."
+            });
+        }
+
         // PUT api/<UserController>/5
         [CustomAuthorize("3")]
         [HttpPut("{id}")]
@@ -302,7 +397,35 @@ namespace FOMSOData.Controllers
                     detail = "Delete successful."
                 });
             }
+        [CustomAuthorize("1")]
+        [HttpDelete("staff/{id}")]
+        public async Task<ActionResult> DeleteForStaff(int id)
+        {
 
+            var exist = await userRepository.GetUserById(id);
+            if (exist == null)
+            {
+                return NotFound(new
+                {
+                    code = StatusCodes.Status404NotFound,
+                    detail = "User not found."
+                });
+            }
+            if (exist.Role != 0)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    code = StatusCodes.Status403Forbidden,
+                    detail = "You do not have permission"
+                });
+            }
+            await userRepository.Delete(id);
+            return Ok(new
+            {
+                code = StatusCodes.Status200OK,
+                detail = "Delete successful."
+            });
+        }
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginDTO loginDTO)
         {
@@ -374,6 +497,7 @@ namespace FOMSOData.Controllers
 
                 });
         }
+        [CustomAuthorize("1")]
         [HttpPost("import")]
         public async Task<IActionResult> ImportUsersCsv(IFormFile file)
         {

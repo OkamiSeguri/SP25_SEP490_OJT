@@ -67,13 +67,18 @@ namespace DataAccess
         }
         public async Task Delete(int id)
         {
-            var user = await GetUserById(id);
+            var user = await _context.Users.Include(u => u.StudentProfile).FirstOrDefaultAsync(u => u.UserId == id);
             if (user != null)
             {
+                if (user.StudentProfile != null)
+                {
+                    _context.StudentProfiles.Remove(user.StudentProfile);
+                }
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
             }
         }
+
         public async Task<(List<string> DuplicateMSSVs, List<string> DuplicateEmails)> ImportUsersAsync(IEnumerable<User> users)
         {
             var existingUsers = await _context.Users.ToListAsync();

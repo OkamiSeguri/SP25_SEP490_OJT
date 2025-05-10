@@ -18,7 +18,6 @@ namespace FOMSOData.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [CustomAuthorize("1")]
 
     public class StudentGradeController : ControllerBase
     {
@@ -33,6 +32,7 @@ namespace FOMSOData.Controllers
             studentGradeRepository = new StudentGradeRepository();
             cohortCurriculumRepository = new CohortCurriculumRepository();
         }
+        [CustomAuthorize("1")]
 
         // GET: api/<StudentGradeController>
         [HttpGet]
@@ -95,12 +95,17 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
+        [CustomAuthorize("1","0","2")]
 
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetGradeByUserId(int userId)
         {
-
-                var grades = await studentGradeRepository.GetGradeByUserId(userId);
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int tokenUserId))
+            {
+                return Unauthorized(new { code = 401, detail = "Invalid or missing authentication token" });
+            }
+            var grades = await studentGradeRepository.GetGradeByUserId(userId);
                 var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
 
                 if (grades == null || !grades.Any())
@@ -111,7 +116,17 @@ namespace FOMSOData.Controllers
                         detail = "No grades found for this user."
                     });
                 }
-                var result = grades.Select(g =>
+            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if ((roleClaim != "1" && roleClaim != "2") && tokenUserId != userId)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    code = 403,
+                    detail = "You do not have permission"
+                });
+            }
+            var result = grades.Select(g =>
                 {
                     // Lấy semester tối đa của curriculum trong cohort
                     var maxSemester = cohorts
@@ -147,6 +162,10 @@ namespace FOMSOData.Controllers
                 });
             }
 
+
+
+        [CustomAuthorize("1")]
+
         // GET api/<StudentGradeController>/5
         [HttpGet("{userId}/{curriculumId}")]
         public async Task<IActionResult> Get(int userId, int curriculumId)
@@ -171,6 +190,7 @@ namespace FOMSOData.Controllers
                 });
             }
 
+        [CustomAuthorize("1")]
 
         // POST api/<StudentGradeController>
         [HttpPost]
@@ -224,6 +244,7 @@ namespace FOMSOData.Controllers
 
         }
 
+        [CustomAuthorize("1")]
 
         // PUT api/<StudentGradeController>/5
         [HttpPut("{userId}/{curriculumId}")]
@@ -266,6 +287,7 @@ namespace FOMSOData.Controllers
             }
 
 
+        [CustomAuthorize("1")]
 
         // DELETE api/<StudentGradeController>/5
         [HttpDelete("{userId}/{curriculumId}")]
@@ -290,6 +312,8 @@ namespace FOMSOData.Controllers
                     status = StatusCodes.Status200OK
                 });
             }
+        [CustomAuthorize("1")]
+
         [HttpPost("import")]
         public async Task<IActionResult> ImportCsv(IFormFile file)
         {

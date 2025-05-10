@@ -25,6 +25,8 @@ namespace FOMSOData.Controllers
         private readonly IUserRepository userRepository;
         private readonly IStudentGradeRepository studentGradeRepository;
         private readonly ICohortCurriculumRepository cohortCurriculumRepository;
+        private readonly IOJTConditionRepository ojtConditionRepository;
+
         private readonly JWTService jwtService;
 
         public StudentProfileController(JWTService jwtService)
@@ -33,6 +35,8 @@ namespace FOMSOData.Controllers
             studentProfileRepository = new StudentProfileRepository();
             studentGradeRepository = new StudentGradeRepository();
             cohortCurriculumRepository = new CohortCurriculumRepository();
+            ojtConditionRepository = new OJTConditionRepository();
+
             this.jwtService = jwtService;
 
         }
@@ -45,24 +49,50 @@ namespace FOMSOData.Controllers
                 return NotFound(new { code = 404, detail = "No student profiles found" });
             }
 
-            // Lấy danh sách UserId -> MSSV
             var users = await userRepository.GetUserAll();
             var userDict = users.ToDictionary(u => u.UserId, u => u.MSSV);
 
-            return Ok(new
+            // Chuẩn bị kết quả kèm Eligibility
+            var resultList = new List<object>();
+            foreach (var u in students)
             {
-                results = students.Select(u => new
+                bool isEligible = await IsEligibleForOJT(u.UserId); // Gọi logic kiểm tra OJT
+                resultList.Add(new
                 {
                     studentId = u.StudentId,
                     mssv = userDict.ContainsKey(u.UserId) ? userDict[u.UserId] : "Unknown",
                     cohort = u.Cohort,
                     totalCredits = u.TotalCredits,
                     debtCredits = u.DebtCredits,
-                }),
+                    ojtEligible = isEligible
+                });
+            }
+
+            return Ok(new
+            {
+                results = resultList,
                 status = StatusCodes.Status200OK
             });
         }
 
+
+        private async Task<bool> IsEligibleForOJT(int userId)
+        {
+            var studentProfile = await studentProfileRepository.GetStudentProfileByUserId(userId);
+            if (studentProfile == null) return false;
+
+            double debtRatio = (double)studentProfile.DebtCredits.GetValueOrDefault()
+                               / studentProfile.TotalCredits.GetValueOrDefault();
+
+            var failedMandatorySubjects = await studentProfileRepository.GetFailedMandatorySubjectsAsync(userId);
+            double maxDebtRatio = await ojtConditionRepository.GetMaxDebtRatioAsync();
+            bool checkFailedSubjects = await ojtConditionRepository.ShouldCheckFailedSubjectsAsync();
+
+            if (debtRatio > maxDebtRatio) return false;
+            if (checkFailedSubjects && failedMandatorySubjects.Any()) return false;
+
+            return true;
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<StudentProfile>> GetStudentProfile(int id)
@@ -190,31 +220,6 @@ namespace FOMSOData.Controllers
                 return Ok(new { status = 200, message = "Delete Success" });
             }
 
-        [HttpGet("check/{userId}")]
-        public async Task<IActionResult> CheckOJT(int userId)
-        {
-            var studentProfile = await studentProfileRepository.GetStudentProfileByUserId(userId);
-            if (studentProfile == null)
-                return NotFound(new { message = "Student profile not found." });
-
-            double debtRatio = (double)studentProfile.DebtCredits.GetValueOrDefault()
-                               / studentProfile.TotalCredits.GetValueOrDefault();
-            var failedMandatorySubjects = await studentProfileRepository.GetFailedMandatorySubjectsAsync(userId);
-
-            // List of errors
-            List<string> errors = new List<string>();
-
-            if (debtRatio > 0.1)
-                errors.Add("Outstanding credits exceed 10% of the total credits.");
-
-            if (failedMandatorySubjects.Any())
-                errors.Add("Failed mandatory subjects.");
-
-            if (errors.Count > 0)
-                return Ok(new { message = "Not eligible for OJT", reasons = errors });
-
-            return Ok(new { message = "Eligible for OJT." });
-        }
 
         [HttpPost("import")]
         public async Task<IActionResult> ImportCsv(IFormFile file)

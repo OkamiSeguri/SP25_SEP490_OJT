@@ -160,7 +160,15 @@ namespace DataAccess
             }
 
             await _context.SaveChangesAsync();
+            var affectedUserIds = grades
+       .Where(g => !missingUserIds.Contains(g.UserId))
+       .Select(g => g.UserId)
+       .Distinct();
 
+            foreach (var userId in affectedUserIds)
+            {
+                await UpdateStudentCredits(userId);
+            }
             return (missingUserIds, missingCurriculumIds);
         }
 
