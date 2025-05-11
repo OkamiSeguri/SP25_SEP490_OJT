@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Repositories;
+﻿using FOMSOData.Authorize;
 using FOMSOData.Models;
+using Microsoft.AspNetCore.Mvc;
+using Repositories;
 using Services;
-using FOMSOData.Authorize;
+using System.Security.Claims;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FOMSOData.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [CustomAuthorize("1")]
+    [CustomAuthorize("1", "0")]
 
     public class OJTConditionController : ControllerBase
     {
@@ -22,28 +23,25 @@ namespace FOMSOData.Controllers
             studentProfileRepository = new StudentProfileRepository();
 
         }
-        // GET: api/<OJTCondition>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
 
-        // GET api/<OJTCondition>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<OJTCondition>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
         [HttpGet("check/{userId}")]
         public async Task<IActionResult> CheckOJT(int userId)
         {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int tokenUserId))
+            {
+                return Unauthorized(new { code = 401, detail = "Invalid or missing authentication token" });
+            }
+            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if ((roleClaim != "1" && roleClaim != "2") && tokenUserId != userId)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    code = 403,
+                    detail = "You do not have permission"
+                });
+            }
             var studentProfile = await studentProfileRepository.GetStudentProfileByUserId(userId);
             if (studentProfile == null)
                 return NotFound(new { message = "Student profile not found." });
@@ -77,12 +75,6 @@ namespace FOMSOData.Controllers
         {
             await ojtConditionRepository.UpdateConditionAsync(request.Key, request.Value);
             return Ok(new { message = "Condition updated successfully." });
-        }
-
-        // DELETE api/<OJTCondition>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

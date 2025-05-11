@@ -1,13 +1,10 @@
-﻿using Azure.Core;
-using BusinessObject;
+﻿using BusinessObject;
 using CsvHelper;
 using FOMSOData.Authorize;
 using FOMSOData.Mappings;
 using FOMSOData.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
-using System.Diagnostics;
 using System.Globalization;
 using System.Security.Claims;
 using System.Text;
@@ -18,7 +15,6 @@ namespace FOMSOData.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [CustomAuthorize("1")]
 
     public class StudentGradeController : ControllerBase
     {
@@ -33,21 +29,22 @@ namespace FOMSOData.Controllers
             studentGradeRepository = new StudentGradeRepository();
             cohortCurriculumRepository = new CohortCurriculumRepository();
         }
+        [CustomAuthorize("1")]
 
         // GET: api/<StudentGradeController>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentGrade>>> Get()
         {
 
-                var grade = await studentGradeRepository.GetGradesAll();
-                if (grade == null)
+            var grade = await studentGradeRepository.GetGradesAll();
+            if (grade == null)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, new
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, new
-                    {
-                        code21 = StatusCodes.Status404NotFound,
-                        detail = "No grade found"
-                    });
-                }
+                    code21 = StatusCodes.Status404NotFound,
+                    detail = "No grade found"
+                });
+            }
             var users = await userRepository.GetUserAll();
             var userDict = users.ToDictionary(u => u.UserId, u => u.MSSV);
 
@@ -56,96 +53,115 @@ namespace FOMSOData.Controllers
 
             var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
 
-                var result = grade.Select(g =>
+            var result = grade.Select(g =>
+            {
+
+                var maxSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Select(cc => cc.Semester)
+                    .DefaultIfEmpty(0)
+                    .Max();
+                var minSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Select(cc => cc.Semester)
+                    .DefaultIfEmpty(0)
+                    .Min();
+
+                int slowBy = g.Semester - maxSemester;
+                int fastBy = minSemester - g.Semester;
+
+                bool isSlowStudy = slowBy > 0;
+                bool isFastStudy = fastBy > 0;
+
+
+                return new
                 {
-
-                    var maxSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Select(cc => cc.Semester)
-                        .DefaultIfEmpty(0) 
-                        .Max();
-                    var minSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Select(cc => cc.Semester)
-                        .DefaultIfEmpty(0)
-                        .Min();
-
-                    int slowBy = g.Semester - maxSemester;  
-                    int fastBy = minSemester - g.Semester;  
-
-                    bool isSlowStudy = slowBy > 0;
-                    bool isFastStudy = fastBy > 0;
-
-
-                    return new
-                    {
-                        mssv = userDict.ContainsKey(g.UserId) ? userDict[g.UserId] : "Unknown",
-                        subjectCode = curriculumDict.ContainsKey(g.CurriculumId) ? curriculumDict[g.CurriculumId] : "Unknown",
-                        semester = g.Semester,
-                        grade = g.Grade,
-                        ispass = g.IsPassed,
-                        status = isSlowStudy
-                    ? $"Slow study by {slowBy} semesters"
-                    : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
-                    };
-                });
-                return Ok(new
-                {
-                    results = result,
-                    status = StatusCodes.Status200OK
-                });
-            }
+                    mssv = userDict.ContainsKey(g.UserId) ? userDict[g.UserId] : "Unknown",
+                    subjectCode = curriculumDict.ContainsKey(g.CurriculumId) ? curriculumDict[g.CurriculumId] : "Unknown",
+                    semester = g.Semester,
+                    grade = g.Grade,
+                    ispass = g.IsPassed,
+                    status = isSlowStudy
+                ? $"Slow study by {slowBy} semesters"
+                : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
+                };
+            });
+            return Ok(new
+            {
+                results = result,
+                status = StatusCodes.Status200OK
+            });
+        }
+        [CustomAuthorize("1", "0", "2")]
 
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetGradeByUserId(int userId)
         {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int tokenUserId))
+            {
+                return Unauthorized(new { code = 401, detail = "Invalid or missing authentication token" });
+            }
+            var grades = await studentGradeRepository.GetGradeByUserId(userId);
+            var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
 
-                var grades = await studentGradeRepository.GetGradeByUserId(userId);
-                var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
-
-                if (grades == null || !grades.Any())
+            if (grades == null || !grades.Any())
+            {
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        code = StatusCodes.Status404NotFound,
-                        detail = "No grades found for this user."
-                    });
-                }
-                var result = grades.Select(g =>
-                {
-                    // Lấy semester tối đa của curriculum trong cohort
-                    var maxSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Max(cc => cc.Semester);
-
-                    var minSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Min(cc => (int?)cc.Semester) ?? 0;
-                    int slowBy = g.Semester - maxSemester;
-                    int fastBy = minSemester - g.Semester;
-
-                    bool isSlowStudy = slowBy > 0;
-                    bool isFastStudy = fastBy > 0;
-
-
-                    return new
-                    {
-                        userId = g.UserId,
-                        curriculumId = g.CurriculumId,
-                        semester = g.Semester,
-                        grade = g.Grade,
-                        ispass = g.IsPassed,
-                        status = isSlowStudy
-                    ? $"Slow study by {slowBy} semesters"
-                    : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
-                    };
-                });
-                return Ok(new
-                {
-                    results = grades,
-                    status = StatusCodes.Status200OK
+                    code = StatusCodes.Status404NotFound,
+                    detail = "No grades found for this user."
                 });
             }
+            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if ((roleClaim != "1" && roleClaim != "2") && tokenUserId != userId)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    code = 403,
+                    detail = "You do not have permission"
+                });
+            }
+            var result = grades.Select(g =>
+            {
+                // Lấy semester tối đa của curriculum trong cohort
+                var maxSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Max(cc => cc.Semester);
+
+                var minSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Min(cc => (int?)cc.Semester) ?? 0;
+                int slowBy = g.Semester - maxSemester;
+                int fastBy = minSemester - g.Semester;
+
+                bool isSlowStudy = slowBy > 0;
+                bool isFastStudy = fastBy > 0;
+
+
+                return new
+                {
+                    userId = g.UserId,
+                    curriculumId = g.CurriculumId,
+                    semester = g.Semester,
+                    grade = g.Grade,
+                    ispass = g.IsPassed,
+                    status = isSlowStudy
+                ? $"Slow study by {slowBy} semesters"
+                : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
+                };
+            });
+            return Ok(new
+            {
+                results = grades,
+                status = StatusCodes.Status200OK
+            });
+        }
+
+
+
+        [CustomAuthorize("1")]
 
         // GET api/<StudentGradeController>/5
         [HttpGet("{userId}/{curriculumId}")]
@@ -153,24 +169,25 @@ namespace FOMSOData.Controllers
         {
 
 
-                var grade = await studentGradeRepository.GetGrade(userId, curriculumId);
+            var grade = await studentGradeRepository.GetGrade(userId, curriculumId);
 
-                if (grade == null)
+            if (grade == null)
+            {
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        code = StatusCodes.Status404NotFound,
-                        detail = "Grade not found."
-                    });
-                }
-
-                return Ok(new
-                {
-                    result = grade,
-                    status = StatusCodes.Status200OK
+                    code = StatusCodes.Status404NotFound,
+                    detail = "Grade not found."
                 });
             }
 
+            return Ok(new
+            {
+                result = grade,
+                status = StatusCodes.Status200OK
+            });
+        }
+
+        [CustomAuthorize("1")]
 
         // POST api/<StudentGradeController>
         [HttpPost]
@@ -193,19 +210,19 @@ namespace FOMSOData.Controllers
             }
 
             var existingGrade = await studentGradeRepository.GetGrade(user.UserId, curriculum.CurriculumId);
-                if (existingGrade != null)
+            if (existingGrade != null)
+            {
+                return Conflict(new
                 {
-                    return Conflict(new
-                    {
-                        code = StatusCodes.Status409Conflict,
-                        detail = "Student grade already exists"
-                    });
-                }
+                    code = StatusCodes.Status409Conflict,
+                    detail = "Student grade already exists"
+                });
+            }
             var studentGrade = new StudentGrade
             {
                 UserId = user.UserId,
                 CurriculumId = curriculum.CurriculumId,
-                Grade = studentGradeDTO.Grade, 
+                Grade = studentGradeDTO.Grade,
                 IsPassed = studentGradeDTO.IsPassed
             };
             await studentGradeRepository.Create(studentGrade);
@@ -224,6 +241,7 @@ namespace FOMSOData.Controllers
 
         }
 
+        [CustomAuthorize("1")]
 
         // PUT api/<StudentGradeController>/5
         [HttpPut("{userId}/{curriculumId}")]
@@ -235,61 +253,64 @@ namespace FOMSOData.Controllers
                 return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
 
-                var exist = await studentGradeRepository.GetGrade(userId, curriculumId);
-                if (exist == null)
+            var exist = await studentGradeRepository.GetGrade(userId, curriculumId);
+            if (exist == null)
+            {
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        code = StatusCodes.Status404NotFound,
-                        detail = "Grade not found."
-                    });
-                }
-
-                studentGrade.UserId = userId;
-                studentGrade.CurriculumId = curriculumId;
-
-                await studentGradeRepository.Update(studentGrade);
-
-                return Ok(new
-                {
-                    result = new
-                    {
-                        userId = studentGrade.UserId,
-                        curriculumId = studentGrade.CurriculumId,
-                        semester = studentGrade.Semester,
-                        grade = studentGrade.Grade,
-                        ispass = studentGrade.IsPassed
-                    },
-                    status = StatusCodes.Status200OK
+                    code = StatusCodes.Status404NotFound,
+                    detail = "Grade not found."
                 });
-
             }
 
+            studentGrade.UserId = userId;
+            studentGrade.CurriculumId = curriculumId;
 
+            await studentGradeRepository.Update(studentGrade);
+
+            return Ok(new
+            {
+                result = new
+                {
+                    userId = studentGrade.UserId,
+                    curriculumId = studentGrade.CurriculumId,
+                    semester = studentGrade.Semester,
+                    grade = studentGrade.Grade,
+                    ispass = studentGrade.IsPassed
+                },
+                status = StatusCodes.Status200OK
+            });
+
+        }
+
+
+        [CustomAuthorize("1")]
 
         // DELETE api/<StudentGradeController>/5
         [HttpDelete("{userId}/{curriculumId}")]
         public async Task<IActionResult> DeleteGrade(int userId, int curriculumId)
         {
 
-                var exist = await studentGradeRepository.GetGrade(userId, curriculumId);
-                if (exist == null)
+            var exist = await studentGradeRepository.GetGrade(userId, curriculumId);
+            if (exist == null)
+            {
+                return NotFound(new
                 {
-                    return NotFound(new
-                    {
-                        code = StatusCodes.Status404NotFound,
-                        detail = "Grade not found."
-                    });
-                }
-
-                await studentGradeRepository.Delete(userId, curriculumId);
-
-                return Ok(new
-                {
-                    message = "Grade deleted successfully",
-                    status = StatusCodes.Status200OK
+                    code = StatusCodes.Status404NotFound,
+                    detail = "Grade not found."
                 });
             }
+
+            await studentGradeRepository.Delete(userId, curriculumId);
+
+            return Ok(new
+            {
+                message = "Grade deleted successfully",
+                status = StatusCodes.Status200OK
+            });
+        }
+        [CustomAuthorize("1")]
+
         [HttpPost("import")]
         public async Task<IActionResult> ImportCsv(IFormFile file)
         {
@@ -412,10 +433,5 @@ namespace FOMSOData.Controllers
                 return Ok(new { message = "Student Grades CSV imported successfully!", count = studentGrades.Count });
             }
         }
-
-
-
-
-
     }
 }

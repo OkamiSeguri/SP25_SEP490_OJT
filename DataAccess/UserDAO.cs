@@ -1,14 +1,9 @@
 ﻿using BusinessObject;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class UserDAO: SingletonBase<UserDAO>
+    public class UserDAO : SingletonBase<UserDAO>
     {
         public async Task<User> GetUserByEmailAndPassword(string email, string password)
         {
@@ -24,7 +19,7 @@ namespace DataAccess
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.UserId == id);
             if (user == null) return null; return user;
-        }       
+        }
         public async Task<User> GetUserByMSSV(string mssv)
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.MSSV == mssv);
@@ -34,7 +29,7 @@ namespace DataAccess
         {
             return await _context.Users
                 .Where(u => mssvList.Contains(u.MSSV))
-                .AsNoTracking() 
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<User> GetUserByEmail(string Email)
@@ -53,7 +48,7 @@ namespace DataAccess
         }
         public async Task Create(User user)
         {
-            await _context.Users.AddAsync(user); 
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
         public async Task Update(User user)
@@ -67,13 +62,18 @@ namespace DataAccess
         }
         public async Task Delete(int id)
         {
-            var user = await GetUserById(id);
+            var user = await _context.Users.Include(u => u.StudentProfile).FirstOrDefaultAsync(u => u.UserId == id);
             if (user != null)
             {
+                if (user.StudentProfile != null)
+                {
+                    _context.StudentProfiles.Remove(user.StudentProfile);
+                }
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync();
             }
         }
+
         public async Task<(List<string> DuplicateMSSVs, List<string> DuplicateEmails)> ImportUsersAsync(IEnumerable<User> users)
         {
             var existingUsers = await _context.Users.ToListAsync();
@@ -111,7 +111,5 @@ namespace DataAccess
 
             return (duplicateMSSVs, duplicateEmails);
         }
-
-
     }
 }

@@ -1,8 +1,5 @@
 ﻿using BusinessObject;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DataAccess
 {
@@ -13,15 +10,15 @@ namespace DataAccess
         public async Task<IEnumerable<StudentGrade>> GetGradesAll()
         {
             return await _context.StudentGrades.ToListAsync();
-        }     
+        }
 
         public async Task<IEnumerable<StudentGrade>> GetGradeByUserId(int id)
         {
             var grades = await _context.StudentGrades
                 .Where(c => c.UserId == id)
-                .ToListAsync();  
+                .ToListAsync();
 
-            return grades; 
+            return grades;
         }
         public async Task UpdateStudentCredits(int userId)
         {
@@ -52,9 +49,9 @@ namespace DataAccess
                 if (curriculumCredits.TryGetValue(grade.CurriculumId, out int credits))
                 {
                     if (grade.Grade >= 5)
-                        totalCredits += credits; 
+                        totalCredits += credits;
                     else
-                        debtCredits += credits; 
+                        debtCredits += credits;
                 }
             }
 
@@ -80,7 +77,7 @@ namespace DataAccess
         }
         public async Task Update(StudentGrade studentGrade)
         {
-            var existingItem = await GetGrade(studentGrade.UserId,studentGrade.CurriculumId);
+            var existingItem = await GetGrade(studentGrade.UserId, studentGrade.CurriculumId);
             if (existingItem != null)
             {
                 _context.Entry(existingItem).CurrentValues.SetValues(studentGrade);
@@ -91,7 +88,7 @@ namespace DataAccess
         }
         public async Task Delete(int UserId, int CurriculumId)
         {
-            var grade = await GetGrade(UserId,CurriculumId);
+            var grade = await GetGrade(UserId, CurriculumId);
             if (grade != null)
             {
                 _context.StudentGrades.Remove(grade);
@@ -160,7 +157,15 @@ namespace DataAccess
             }
 
             await _context.SaveChangesAsync();
+            var affectedUserIds = grades
+       .Where(g => !missingUserIds.Contains(g.UserId))
+       .Select(g => g.UserId)
+       .Distinct();
 
+            foreach (var userId in affectedUserIds)
+            {
+                await UpdateStudentCredits(userId);
+            }
             return (missingUserIds, missingCurriculumIds);
         }
 
@@ -176,8 +181,5 @@ namespace DataAccess
                 await UpdateStudentCredits(userId);
             }
         }
-
-
-
     }
 }
