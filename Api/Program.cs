@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Repositories;
 using Services;
 using System.Text;
 
@@ -27,7 +28,10 @@ builder.Services.AddScoped(typeof(ApplicationDbContext));
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddScoped<JWTService>();
+
+//Upload Image to Cloudinary Service
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<IOJTProgramRepository, OJTProgramRepository>();
 
 
 builder.Services.AddControllers();

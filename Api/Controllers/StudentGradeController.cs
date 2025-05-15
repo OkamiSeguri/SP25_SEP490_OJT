@@ -29,9 +29,9 @@ namespace FOMSOData.Controllers
             studentGradeRepository = new StudentGradeRepository();
             cohortCurriculumRepository = new CohortCurriculumRepository();
         }
-        [CustomAuthorize("1")]
 
         // GET: api/<StudentGradeController>
+        [CustomAuthorize("0", "1")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentGrade>>> Get()
         {

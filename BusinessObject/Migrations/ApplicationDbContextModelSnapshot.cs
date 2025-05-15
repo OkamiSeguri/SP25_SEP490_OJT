@@ -151,10 +151,19 @@ namespace BusinessObject.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Major")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("OJTId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProgramId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Semester")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
                     b.HasKey("FeedbackId");
@@ -183,10 +192,19 @@ namespace BusinessObject.Migrations
                     b.Property<int>("EnterpriseId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Major")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("ProgramName")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Requirements")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Semester")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("StartDate")
@@ -314,6 +332,9 @@ namespace BusinessObject.Migrations
                     b.Property<int?>("DebtCredits")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int?>("TotalCredits")
                         .HasColumnType("int");
 
@@ -345,6 +366,9 @@ namespace BusinessObject.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("MSSV")
                         .HasColumnType("longtext");

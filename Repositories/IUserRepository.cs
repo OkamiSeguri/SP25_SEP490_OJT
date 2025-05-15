@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BusinessObject;
+﻿using BusinessObject;
 
 namespace Repositories
 {
@@ -21,6 +16,5 @@ namespace Repositories
         Task Delete(int id);
         Task<User> GetCustomerByEmailAndPassword(string email, string password);
         Task<(List<string> DuplicateMSSVs, List<string> DuplicateEmails)> ImportUsersAsync(IEnumerable<User> user);
-
     }
 }

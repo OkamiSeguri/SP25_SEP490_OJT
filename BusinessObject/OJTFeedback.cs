@@ -9,6 +9,9 @@ namespace BusinessObject
         public int OJTId { get; set; }
         public int EnterpriseId { get; set; }
         public int ProgramId { get; set; }
+        public int StudentId { get; set; }
+        public string? Semester { get; set; }
+        public string? Major { get; set; }
         public string GivenBy { get; set; }
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;

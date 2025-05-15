@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessObject
 {
@@ -18,6 +13,7 @@ namespace BusinessObject
         public int CurriculumId { get; set; }
         public int? TotalCredits { get; set; }
         public int? DebtCredits { get; set; }
+        public bool IsDeleted { get; set; } = false;
         public User? User { get; set; }
         [ForeignKey(nameof(Cohort))]
         public CohortCurriculum? CohortCurriculum { get; set; }

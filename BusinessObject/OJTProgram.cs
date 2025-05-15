@@ -8,6 +8,8 @@ namespace BusinessObject
         public int ProgramId { get; set; }
         public int EnterpriseId { get; set; }
         public string? ProgramName { get; set; }
+        public string? Semester { get; set; }
+        public string? Major { get; set; }
         public string? Description { get; set; }
         public string? Requirements { get; set; }
         public string? Status { get; set; }

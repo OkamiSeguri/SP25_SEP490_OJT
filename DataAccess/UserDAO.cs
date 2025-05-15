@@ -7,76 +7,100 @@ namespace DataAccess
     {
         public async Task<User> GetUserByEmailAndPassword(string email, string password)
         {
-            var User = await _context.Users
-                .FirstOrDefaultAsync(c => c.Email == email && c.Password == password);
-            return User;
+            return await _context.Users
+                .FirstOrDefaultAsync(c => c.Email == email && c.Password == password && !c.IsDeleted);
         }
+
         public async Task<List<User>> GetUserAll()
         {
-            return await _context.Users.ToListAsync();
-        }
-        public async Task<User> GetUserById(int id)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(c => c.UserId == id);
-            if (user == null) return null; return user;
-        }
-        public async Task<User> GetUserByMSSV(string mssv)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(c => c.MSSV == mssv);
-            if (user == null) return null; return user;
-        }
-        public async Task<List<User>> GetUserByMSSVList(List<string> mssvList)
-        {
             return await _context.Users
-                .Where(u => mssvList.Contains(u.MSSV))
+                .Where(u => !u.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync();
         }
-        public async Task<User> GetUserByEmail(string Email)
+
+        public async Task<User> GetUserById(int id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(c => c.Email == Email);
-            if (user == null) return null; return user;
+            return await _context.Users
+                .FirstOrDefaultAsync(c => c.UserId == id && !c.IsDeleted);
         }
+
+        public async Task<User> GetUserByMSSV(string mssv)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(c => c.MSSV == mssv && !c.IsDeleted);
+        }
+
+        public async Task<List<User>> GetUserByMSSVList(List<string> mssvList)
+        {
+            return await _context.Users
+                .Where(u => mssvList.Contains(u.MSSV) && !u.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(c => c.Email == email && !c.IsDeleted);
+        }
+
         public async Task<IEnumerable<User>> GetUserByRole(int type)
         {
-            return await _context.Users.Where(a => a.Role == type).ToListAsync();
+            return await _context.Users
+                .Where(a => a.Role == type && !a.IsDeleted)
+                .ToListAsync();
         }
-        public async Task<User> ValidateUser(string Email, string Password)
+
+        public async Task<User> ValidateUser(string email, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(c => c.Email == Email && c.Password == Password);
-            if (user == null) return null; return user;
+            return await _context.Users
+                .FirstOrDefaultAsync(c => c.Email == email && c.Password == password && !c.IsDeleted);
         }
+
         public async Task Create(User user)
         {
+            user.IsDeleted = false;
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
+
         public async Task Update(User user)
         {
             var existingItem = await GetUserById(user.UserId);
             if (existingItem != null)
             {
                 _context.Entry(existingItem).CurrentValues.SetValues(user);
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
         }
-        public async Task Delete(int id)
+
+        public async Task SoftDelete(int id)
         {
-            var user = await _context.Users.Include(u => u.StudentProfile).FirstOrDefaultAsync(u => u.UserId == id);
+            var user = await _context.Users
+                .Include(u => u.StudentProfile)
+                .FirstOrDefaultAsync(u => u.UserId == id && !u.IsDeleted);
+
             if (user != null)
             {
+                user.IsDeleted = true;
+
                 if (user.StudentProfile != null)
                 {
-                    _context.StudentProfiles.Remove(user.StudentProfile);
+                    user.StudentProfile.IsDeleted = true;
+                    _context.StudentProfiles.Update(user.StudentProfile);
                 }
-                _context.Users.Remove(user);
+
+                _context.Users.Update(user);
                 await _context.SaveChangesAsync();
             }
         }
 
         public async Task<(List<string> DuplicateMSSVs, List<string> DuplicateEmails)> ImportUsersAsync(IEnumerable<User> users)
         {
-            var existingUsers = await _context.Users.ToListAsync();
+            var existingUsers = await _context.Users
+                .Where(u => !u.IsDeleted)
+                .ToListAsync();
 
             var existingMSSVs = existingUsers.Select(u => u.MSSV).ToHashSet();
             var existingEmails = existingUsers.Select(u => u.Email).ToHashSet();
@@ -97,8 +121,8 @@ namespace DataAccess
                 }
                 else
                 {
-                    // Thiết lập Role mặc định là 0
                     user.Role = 0;
+                    user.IsDeleted = false;
                     usersToAdd.Add(user);
                 }
             }

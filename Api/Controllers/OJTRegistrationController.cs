@@ -55,6 +55,9 @@ namespace FOMSOData.Controllers
         public async Task<IEnumerable<OJTRegistration>> GetByEnterpriseId(int enterpriseId)
             => await ojtRegistrationRepository.GetByEnterpriseId(enterpriseId);
 
+        // lay danh sách sinh vien dang thuc tap tai doanh nghiep (EnterpriseId) (role "2")
+
+
         // Lấy danh sách đăng ký OJT theo sinh viên (StudentId) (role "2")
         [CustomAuthorize("1", "2", "3")]
         [HttpGet("student/{studentId}")]
@@ -112,7 +115,7 @@ namespace FOMSOData.Controllers
         }
 
         // Thay đổi trạng thái của bản đăng ký OJT (dành cho role "2")
-        [CustomAuthorize("2")]
+        [CustomAuthorize("1")]
         [HttpPatch("status/{ojtId}")]
         public async Task<IActionResult> ChangeStatus(int ojtId, [FromBody] string newStatus)
         {

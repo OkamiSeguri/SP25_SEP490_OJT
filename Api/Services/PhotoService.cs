@@ -7,36 +7,35 @@ namespace FOMSOData.Services
     {
         private readonly Cloudinary _cloudinary;
 
-        public PhotoService(IConfiguration configuration)
+        public PhotoService(IConfiguration config)
         {
             var account = new Account(
-                configuration["Cloudinary:CloudName"],
-                configuration["Cloudinary:ApiKey"],
-                configuration["Cloudinary:ApiSecret"]
+                config["Cloudinary:CloudName"],
+                config["Cloudinary:ApiKey"],
+                config["Cloudinary:ApiSecret"]
             );
 
             _cloudinary = new Cloudinary(account);
         }
 
-        public async Task<string?> UploadPhotoAsync(IFormFile file, string folder)
+        public async Task<string> UploadPhotoAsync(IFormFile file, string folder)
         {
             if (file == null || file.Length == 0)
-                return null;
+                throw new ArgumentException("File is empty");
 
             await using var stream = file.OpenReadStream();
-
             var uploadParams = new ImageUploadParams
             {
                 File = new FileDescription(file.FileName, stream),
                 Folder = folder
             };
 
-            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+            var result = await _cloudinary.UploadAsync(uploadParams);
 
-            if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
-                return uploadResult.SecureUrl.ToString();
+            if (result.Error != null)
+                throw new Exception(result.Error.Message);
 
-            return null;
+            return result.SecureUrl.AbsoluteUri;
         }
     }
 }

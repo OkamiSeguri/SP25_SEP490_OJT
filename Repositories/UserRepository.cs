@@ -1,11 +1,6 @@
-﻿using DataAccess;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BusinessObject;
+﻿using BusinessObject;
 using DataAccess;
+
 namespace Repositories
 {
     public class UserRepository : IUserRepository
@@ -18,26 +13,31 @@ namespace Repositories
         public async Task<User> GetUserById(int id)
         {
             return await UserDAO.Instance.GetUserById(id);
-        }       
+        }
+
         public async Task<User> GetUserByMSSV(string mssv)
         {
             return await UserDAO.Instance.GetUserByMSSV(mssv);
         }
+
         public async Task<List<User>> GetUserByMSSVList(List<string> mssvList)
         {
             return await UserDAO.Instance.GetUserByMSSVList(mssvList);
         }
-        public async Task<User> GetUserByEmail(string Email)
+
+        public async Task<User> GetUserByEmail(string email)
         {
-            return await UserDAO.Instance.GetUserByEmail(Email);
+            return await UserDAO.Instance.GetUserByEmail(email);
         }
+
         public async Task<IEnumerable<User>> GetUserByRole(int type)
         {
             return await UserDAO.Instance.GetUserByRole(type);
         }
-        public async Task<User> ValidateUser(string Email, string Password)
+
+        public async Task<User> ValidateUser(string email, string password)
         {
-            return await UserDAO.Instance.ValidateUser(Email, Password);
+            return await UserDAO.Instance.ValidateUser(email, password);
         }
 
         public async Task Create(User user)
@@ -52,21 +52,18 @@ namespace Repositories
 
         public async Task Delete(int id)
         {
-            await UserDAO.Instance.Delete(id);
+            //soft delete
+            await UserDAO.Instance.SoftDelete(id);
         }
-
 
         public async Task<User> GetCustomerByEmailAndPassword(string email, string password)
         {
             return await UserDAO.Instance.GetUserByEmailAndPassword(email, password);
         }
 
-        public async Task<(List<string> DuplicateMSSVs, List<string> DuplicateEmails)> ImportUsersAsync(IEnumerable<User> user)
+        public async Task<(List<string> DuplicateMSSVs, List<string> DuplicateEmails)> ImportUsersAsync(IEnumerable<User> users)
         {
-            return await UserDAO.Instance.ImportUsersAsync(user);
+            return await UserDAO.Instance.ImportUsersAsync(users);
         }
-
-
-
     }
 }

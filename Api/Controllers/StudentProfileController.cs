@@ -14,7 +14,7 @@ namespace FOMSOData.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [CustomAuthorize("1")]
+    [CustomAuthorize("1", "2", "3")]
 
     public class StudentProfileController : ControllerBase
     {
