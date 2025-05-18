@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250515163833_RemoveStatusInStuProfile")]
-    partial class RemoveStatusInStuProfile
+    [Migration("20250518080614_AddMSSVtoStuFeedback")]
+    partial class AddMSSVtoStuFeedback
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,6 +151,10 @@ namespace BusinessObject.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("GivenBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MSSV")
                         .IsRequired()
                         .HasColumnType("longtext");
 

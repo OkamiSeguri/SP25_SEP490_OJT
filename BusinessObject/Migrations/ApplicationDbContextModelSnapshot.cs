@@ -151,6 +151,10 @@ namespace BusinessObject.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("MSSV")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Major")
                         .HasColumnType("longtext");
 

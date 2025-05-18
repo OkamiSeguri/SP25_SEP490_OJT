@@ -10,7 +10,7 @@ namespace FOMSOData.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [CustomAuthorize("1", "0")]
+    [CustomAuthorize("0", "1")]
 
     public class OJTConditionController : ControllerBase
     {

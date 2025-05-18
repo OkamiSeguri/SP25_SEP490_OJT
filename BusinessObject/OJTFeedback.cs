@@ -13,6 +13,7 @@ namespace BusinessObject
         public string? Semester { get; set; }
         public string? Major { get; set; }
         public string GivenBy { get; set; }
+        public string MSSV { get; set; }
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public OJTProgram? OJTProgram { get; set; }
