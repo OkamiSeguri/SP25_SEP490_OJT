@@ -47,9 +47,9 @@ namespace Repositories
         }
         public async Task DeleteByUserId(int UserId)
         {
-            await StudentProfileDAO.Instance.DeleteByUserId(UserId);
-
+            await StudentProfileDAO.Instance.SoftDelete(UserId);
         }
+
         public async Task<IEnumerable<Curriculum>> GetMandatorySubjectsAsync(int userId)
         {
             return await StudentProfileDAO.Instance.GetMandatorySubjectsAsync(userId);

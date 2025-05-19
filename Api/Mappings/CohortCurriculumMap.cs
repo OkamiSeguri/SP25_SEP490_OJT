@@ -9,7 +9,7 @@ namespace FOMSOData.Mappings
         public CohortCurriculumMap()
         {
             Map(m => m.Cohort).Name("Cohort");
-            Map(m => m.CurriculumId).Name("CurriculumId");
+            Map(m => m.SubjectCode).Name("SubjectCode");
             Map(m => m.Semester).Name("Semester");
         }
     }

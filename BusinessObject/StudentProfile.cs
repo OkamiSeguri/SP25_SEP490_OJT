@@ -18,6 +18,8 @@ namespace BusinessObject
         public int CurriculumId { get; set; }
         public int? TotalCredits { get; set; }
         public int? DebtCredits { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
         public User? User { get; set; }
         [ForeignKey(nameof(Cohort))]
         public CohortCurriculum? CohortCurriculum { get; set; }

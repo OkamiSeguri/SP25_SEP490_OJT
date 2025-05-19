@@ -15,6 +15,8 @@ namespace BusinessObject
         public string Email { get; set; }
         public string Password { get; set; }
         public int Role { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
         public ICollection<OJTRegistration>? OJTRegistration { get; set; }
         public virtual Enterprise? Enterprise { get; set; }
         public StudentProfile? StudentProfile { get; set; }

@@ -15,6 +15,11 @@ namespace Repositories
             var conditions = await OJTConditionDAO.Instance.GetConditionsAsync();
             return double.Parse(conditions["MaxDebtRatio"]);
         }
+        public async Task<IEnumerable<OJTCondition>> GetOJTConditionsAll()
+        {
+            return await OJTConditionDAO.Instance.GetOJTConditionsAll();
+        }
+
 
         public async Task<bool> ShouldCheckFailedSubjectsAsync()
         {

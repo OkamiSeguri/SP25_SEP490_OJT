@@ -12,31 +12,47 @@ namespace DataAccess
     {
         public async Task<IEnumerable<StudentProfile>> GetStudentProfileAll()
         {
-            return await _context.StudentProfiles.AsNoTracking().ToListAsync();
+            return await _context.StudentProfiles
+                .Where(sp => !sp.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync();
         }
+
         public async Task<StudentProfile> GetStudentProfile(int UserId, int StudentId)
         {
-            var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.UserId == UserId && c.StudentId == StudentId);
-            if (studentProfile == null) return null; return studentProfile;
-        }          
+            var studentProfile = await _context.StudentProfiles
+                .Where(sp => !sp.IsDeleted)       
+                .FirstOrDefaultAsync(c => c.UserId == UserId && c.StudentId == StudentId);
+
+            return studentProfile;   
+        }
         public async Task<StudentProfile> GetStudentProfileById(int id)
         {
-            var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.StudentId == id);
-            if (studentProfile == null) return null; return studentProfile;
+            var studentProfile = await _context.StudentProfiles
+                .Where(sp => !sp.IsDeleted)        
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.StudentId == id);
+
+            return studentProfile;
         }
 
 
         public async Task<List<StudentProfile>> GetStudentProfilesByUserIds(List<int> userIds)
         {
             return await _context.StudentProfiles
-                                 .Where(sp => userIds.Contains(sp.UserId))
-                                 .ToListAsync();
+                .Where(sp => userIds.Contains(sp.UserId) && !sp.IsDeleted) 
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<StudentProfile> GetStudentProfileByUserId(int id)
         {
-            var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(c => c.UserId == id);
-            if (studentProfile == null) return null; return studentProfile;
+            var studentProfile = await _context.StudentProfiles
+                .Where(sp => !sp.IsDeleted)       
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.UserId == id);
+
+            return studentProfile;
         }
 
         public async Task Create(StudentProfile studentProfile)
@@ -74,6 +90,21 @@ namespace DataAccess
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task SoftDelete(int userId)
+        {
+            var studentProfile = await _context.StudentProfiles
+                .FirstOrDefaultAsync(sp => sp.UserId == userId && !sp.IsDeleted);
+
+            if (studentProfile != null)
+            {
+                studentProfile.IsDeleted = true;
+                _context.StudentProfiles.Update(studentProfile);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+
         public async Task DeleteByUserId(int userId)
         {
             var studentProfile = _context.StudentProfiles.Where(g => g.UserId == userId);

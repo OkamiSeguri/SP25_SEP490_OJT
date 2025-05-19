@@ -4,6 +4,8 @@ using FOMSOData.Models;
 using Services;
 using FOMSOData.Authorize;
 using System.Security.Claims;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using BusinessObject;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FOMSOData.Controllers
@@ -23,6 +25,23 @@ namespace FOMSOData.Controllers
             studentProfileRepository = new StudentProfileRepository();
 
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAllOJTConditions()
+        {
+            var conditions = await ojtConditionRepository.GetOJTConditionsAll();
+
+            var result = conditions.Select(c => new
+            {
+                key = c.ConditionKey,
+                value = c.ConditionValue,
+            }).ToList();
+
+            return Ok(new
+            {
+                results = result,
+                status = StatusCodes.Status200OK
+            });
+        }
 
         [HttpGet("check/{userId}")]
         public async Task<IActionResult> CheckOJT(int userId)
@@ -32,6 +51,7 @@ namespace FOMSOData.Controllers
             {
                 return Unauthorized(new { code = 401, detail = "Invalid or missing authentication token" });
             }
+
             var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
 
             if ((roleClaim != "1" && roleClaim != "2") && tokenUserId != userId)
@@ -42,33 +62,47 @@ namespace FOMSOData.Controllers
                     detail = "You do not have permission"
                 });
             }
+
             var studentProfile = await studentProfileRepository.GetStudentProfileByUserId(userId);
             if (studentProfile == null)
                 return NotFound(new { message = "Student profile not found." });
 
-            double debtRatio = (double)studentProfile.DebtCredits.GetValueOrDefault()
-                               / studentProfile.TotalCredits.GetValueOrDefault();
+            double debtCredits = studentProfile.DebtCredits.GetValueOrDefault();
+            double totalCredits = studentProfile.TotalCredits.GetValueOrDefault();
+            double calculatedDebtRatio = totalCredits > 0 ? debtCredits / totalCredits : 0;
+
             var failedMandatorySubjects = await studentProfileRepository.GetFailedMandatorySubjectsAsync(userId);
-            Console.WriteLine($"[LOG] DebtCredits: {studentProfile.DebtCredits}");
-            Console.WriteLine($"[LOG] TotalCredits: {studentProfile.TotalCredits}");
-            Console.WriteLine($"[LOG] Calculated DebtRatio: {debtRatio}");
+
             double maxDebtRatio = await ojtConditionRepository.GetMaxDebtRatioAsync();
             bool checkFailedSubjects = await ojtConditionRepository.ShouldCheckFailedSubjectsAsync();
-            Console.WriteLine($"[LOG] MaxDebtRatio from DB: {maxDebtRatio}");
-            Console.WriteLine($"[LOG] CheckFailedSubjects from DB: {checkFailedSubjects}");
-            List<string> errors = new List<string>();
+            double debtRatio = 0;
+            if (studentProfile.TotalCredits.GetValueOrDefault() > 0)
+            {
+                debtRatio = (double)studentProfile.DebtCredits.GetValueOrDefault()
+                            / studentProfile.TotalCredits.GetValueOrDefault();
+            }
 
-            if (debtRatio > maxDebtRatio)
-                errors.Add($"Outstanding credits exceed {maxDebtRatio * 100}% of the total credits.");
+            int debtPercent = (int)(debtRatio * 100);
+            List<string> reasons = new List<string>();
 
             if (checkFailedSubjects && failedMandatorySubjects.Any())
-                errors.Add("Failed mandatory subjects.");
+                reasons.Add("Failed mandatory subjects.");
+            if (debtRatio > maxDebtRatio)
+            {
+                reasons.Add($"Debt ratio exceeds allowed maximum of {(int)(maxDebtRatio * 100)}%.");
+            }
+            bool eligible = reasons.Count == 0;
 
-            if (errors.Count > 0)
-                return Ok(new { message = "Not eligible for OJT", reasons = errors });
-
-            return Ok(new { message = "Eligible for OJT." });
+            return Ok(new
+            {
+                TotalCredits = totalCredits,
+                DebtCredits = debtCredits,
+                DebtPercent = debtPercent,
+                Eligible = eligible,
+                Reasons = reasons
+            });
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCondition([FromBody] ConditionUpdateRequestDTO request)

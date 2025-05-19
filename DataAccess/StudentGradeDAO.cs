@@ -12,23 +12,36 @@ namespace DataAccess
 
         public async Task<IEnumerable<StudentGrade>> GetGradesAll()
         {
-            return await _context.StudentGrades.ToListAsync();
-        }     
+            return await _context.StudentGrades
+                .Where(g => !g.User.IsDeleted && !g.User.StudentProfile.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
 
         public async Task<IEnumerable<StudentGrade>> GetGradeByUserId(int id)
         {
-            var grades = await _context.StudentGrades
-                .Where(c => c.UserId == id)
-                .ToListAsync();  
+            var user = await _context.Users
+                .Include(u => u.StudentProfile)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.UserId == id);
 
-            return grades; 
+            if (user == null || user.IsDeleted || user.StudentProfile == null || user.StudentProfile.IsDeleted)
+            {
+                return new List<StudentGrade>();
+            }
+
+            return await _context.StudentGrades
+                .Where(g => g.UserId == id)
+                .AsNoTracking()
+                .ToListAsync();
         }
+
         public async Task UpdateStudentCredits(int userId)
         {
             var studentProfile = await _context.StudentProfiles.FirstOrDefaultAsync(s => s.UserId == userId);
             if (studentProfile == null)
             {
-                // Nếu chưa có, tạo mới StudentProfile
                 studentProfile = new StudentProfile
                 {
                     UserId = userId,
@@ -38,10 +51,8 @@ namespace DataAccess
 
                 _context.StudentProfiles.Add(studentProfile);
             }
-            // Lấy tất cả điểm của sinh viên này
             var grades = await _context.StudentGrades.Where(g => g.UserId == userId).ToListAsync();
 
-            // Lấy số tín chỉ của các môn học
             var curriculumCredits = await _context.Curriculums.ToDictionaryAsync(c => c.CurriculumId, c => c.Credits);
 
             int totalCredits = 0;
@@ -58,7 +69,6 @@ namespace DataAccess
                 }
             }
 
-            // Cập nhật bảng StudentProfiles
             studentProfile.TotalCredits = totalCredits;
             studentProfile.DebtCredits = debtCredits;
 

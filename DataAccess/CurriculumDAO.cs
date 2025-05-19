@@ -12,16 +12,16 @@ namespace DataAccess
     {
         public async Task<IEnumerable<Curriculum>> GetCurriculumAll()
         {
-            return await _context.Curriculums.ToListAsync();
+            return await _context.Curriculums.AsNoTracking().ToListAsync();
         }
         public async Task<Curriculum> GetCurriculumById(int id)
         {
-            var curriculum = await _context.Curriculums.FirstOrDefaultAsync(c => c.CurriculumId == id);
+            var curriculum = await _context.Curriculums.AsNoTracking().FirstOrDefaultAsync(c => c.CurriculumId == id);
             if (curriculum == null) return null; return curriculum;
         }     
         public async Task<Curriculum> GetCurriculumBySubjectCode(string sc)
         {
-            var curriculum = await _context.Curriculums.FirstOrDefaultAsync(c => c.SubjectCode == sc);
+            var curriculum = await _context.Curriculums.AsNoTracking().FirstOrDefaultAsync(c => c.SubjectCode == sc);
             if (curriculum == null) return null; return curriculum;
         }
         public async Task<List<Curriculum>> GetCurriculumBySubjectCodeList(List<string> subjectCodes)
