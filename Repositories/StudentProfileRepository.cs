@@ -1,11 +1,5 @@
 ﻿using BusinessObject;
 using DataAccess;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repositories
 {
@@ -16,10 +10,10 @@ namespace Repositories
             return await StudentProfileDAO.Instance.GetStudentProfileAll();
         }
 
-        public async Task<StudentProfile> GetStudentProfile(int UserId,int StudentId)
+        public async Task<StudentProfile> GetStudentProfile(int UserId, int StudentId)
         {
-            return await StudentProfileDAO.Instance.GetStudentProfile(UserId,StudentId);
-        }          
+            return await StudentProfileDAO.Instance.GetStudentProfile(UserId, StudentId);
+        }
         public async Task<StudentProfile> GetStudentProfileById(int id)
         {
             return await StudentProfileDAO.Instance.GetStudentProfileById(id);
@@ -31,7 +25,7 @@ namespace Repositories
         public async Task<StudentProfile> GetStudentProfileByUserId(int id)
         {
             return await StudentProfileDAO.Instance.GetStudentProfileByUserId(id);
-        }     
+        }
 
         public async Task Create(StudentProfile studentProfile)
         {
@@ -47,9 +41,9 @@ namespace Repositories
         }
         public async Task DeleteByUserId(int UserId)
         {
-            await StudentProfileDAO.Instance.DeleteByUserId(UserId);
-
+            await StudentProfileDAO.Instance.SoftDelete(UserId);
         }
+
         public async Task<IEnumerable<Curriculum>> GetMandatorySubjectsAsync(int userId)
         {
             return await StudentProfileDAO.Instance.GetMandatorySubjectsAsync(userId);

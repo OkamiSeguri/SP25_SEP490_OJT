@@ -133,7 +133,7 @@
   },
   {
     "ContainingType": "FOMSOData.Controllers.CohortCurriculumController",
-    "Method": "ImportCohortCurriculumCsv",
+    "Method": "ImportCohortCurriculumFile",
     "RelativePath": "api/CohortCurriculum/import",
     "HttpMethod": "POST",
     "IsController": true,
@@ -248,7 +248,7 @@
   },
   {
     "ContainingType": "FOMSOData.Controllers.CurriculumController",
-    "Method": "ImportCurriculumCsv",
+    "Method": "ImportCurriculumFile",
     "RelativePath": "api/Curriculum/import",
     "HttpMethod": "POST",
     "IsController": true,
@@ -359,6 +359,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FOMSOData.Controllers.OJTConditionController",
+    "Method": "GetAllOJTConditions",
+    "RelativePath": "api/OJTCondition",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -1505,7 +1515,7 @@
   },
   {
     "ContainingType": "FOMSOData.Controllers.StudentGradeController",
-    "Method": "ImportCsv",
+    "Method": "ImportFile",
     "RelativePath": "api/StudentGrade/import",
     "HttpMethod": "POST",
     "IsController": true,
@@ -1620,7 +1630,7 @@
   },
   {
     "ContainingType": "FOMSOData.Controllers.StudentProfileController",
-    "Method": "ImportCsv",
+    "Method": "ImportFile",
     "RelativePath": "api/StudentProfile/import",
     "HttpMethod": "POST",
     "IsController": true,
@@ -1741,7 +1751,7 @@
   },
   {
     "ContainingType": "FOMSOData.Controllers.UserController",
-    "Method": "ImportUsersCsv",
+    "Method": "ImportUsersFile",
     "RelativePath": "api/User/import",
     "HttpMethod": "POST",
     "IsController": true,

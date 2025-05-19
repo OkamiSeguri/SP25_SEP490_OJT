@@ -1,10 +1,5 @@
 ﻿using BusinessObject;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess
 {
@@ -14,6 +9,10 @@ namespace DataAccess
         {
             return await _context.OJTConditions
                 .ToDictionaryAsync(c => c.ConditionKey, c => c.ConditionValue);
+        }
+        public async Task<IEnumerable<OJTCondition>> GetOJTConditionsAll()
+        {
+            return await _context.OJTConditions.AsNoTracking().ToListAsync();
         }
         public async Task<OJTCondition> GetConditionByKeyAsync(string key)
         {

@@ -1,9 +1,11 @@
 ﻿using BusinessObject;
+using ClosedXML.Excel;
 using CsvHelper;
 using FOMSOData.Authorize;
 using FOMSOData.Mappings;
 using FOMSOData.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Repositories;
 using System.Globalization;
 using System.Security.Claims;
@@ -29,9 +31,9 @@ namespace FOMSOData.Controllers
             studentGradeRepository = new StudentGradeRepository();
             cohortCurriculumRepository = new CohortCurriculumRepository();
         }
+        [CustomAuthorize("1")]
 
         // GET: api/<StudentGradeController>
-        [CustomAuthorize("0", "1")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentGrade>>> Get()
         {
@@ -123,9 +125,12 @@ namespace FOMSOData.Controllers
                     detail = "You do not have permission"
                 });
             }
+            var users = await userRepository.GetUserAll();
+            var userDict = users.ToDictionary(u => u.UserId, u => u.MSSV);
+            var curriculums = await curriculumRepository.GetCurriculumAll();
+            var curriculumDict = curriculums.ToDictionary(c => c.CurriculumId, c => c.SubjectCode);
             var result = grades.Select(g =>
             {
-                // Lấy semester tối đa của curriculum trong cohort
                 var maxSemester = cohorts
                     .Where(cc => cc.CurriculumId == g.CurriculumId)
                     .Max(cc => cc.Semester);
@@ -142,8 +147,8 @@ namespace FOMSOData.Controllers
 
                 return new
                 {
-                    userId = g.UserId,
-                    curriculumId = g.CurriculumId,
+                    mssv = userDict.ContainsKey(g.UserId) ? userDict[g.UserId] : "Unknown",
+                    subjectCode = curriculumDict.ContainsKey(g.CurriculumId) ? curriculumDict[g.CurriculumId] : "Unknown",
                     semester = g.Semester,
                     grade = g.Grade,
                     ispass = g.IsPassed,
@@ -154,7 +159,7 @@ namespace FOMSOData.Controllers
             });
             return Ok(new
             {
-                results = grades,
+                results = result,
                 status = StatusCodes.Status200OK
             });
         }
@@ -310,128 +315,218 @@ namespace FOMSOData.Controllers
             });
         }
         [CustomAuthorize("1")]
-
         [HttpPost("import")]
-        public async Task<IActionResult> ImportCsv(IFormFile file)
+        public async Task<IActionResult> ImportFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "File is empty or missing." });
 
-            using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
-            using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
+            var extension = Path.GetExtension(file.FileName).ToLower();
+            var records = new List<StudentGradeImportDTO>();
+            var invalidRows = new List<int>();
+
+            try
             {
-                csv.Context.RegisterClassMap<StudentGradeMap>();
-                csv.Read();
-                csv.ReadHeader();
-                var requiredHeaders = new List<string> { "MSSV", "SubjectCode", "Semester", "Grade" };
-                var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
-
-                if (missingHeaders.Any())
+                if (extension == ".csv")
                 {
-                    return BadRequest(new
+                    using var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
+                    using var csv = new CsvReader(stream, CultureInfo.InvariantCulture);
+
+                    csv.Context.RegisterClassMap<StudentGradeMap>();
+                    csv.Read();
+                    csv.ReadHeader();
+
+                    var requiredHeaders = new List<string> { "MSSV", "SubjectCode", "Semester", "Grade" };
+                    var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
+                    if (missingHeaders.Any())
+                        return BadRequest(new { message = "CSV file is missing required columns!", missingColumns = missingHeaders });
+
+                    int rowIndex = 1;
+                    while (csv.Read())
                     {
-                        message = "CSV file is missing required columns!",
-                        missingColumns = missingHeaders
-                    });
-                }
+                        string mssv = csv.GetField("MSSV")?.Trim();
+                        string subjectCode = csv.GetField("SubjectCode")?.Trim();
+                        string semesterStr = csv.GetField("Semester")?.Trim();
+                        string gradeStr = csv.GetField("Grade")?.Trim();
 
-                var records = new List<StudentGradeImportDTO>();
-                var invalidRows = new List<int>();
-                int rowIndex = 1; // Bắt đầu từ dòng 1 (bỏ qua header)
+                        bool isValid = true;
 
-                while (csv.Read())
-                {
-                    var record = new StudentGradeImportDTO();
-                    bool isValid = true;
-                    int semester = 0;
-                    decimal grade = 0m;
+                        isValid &= !string.IsNullOrWhiteSpace(mssv);
+                        isValid &= !string.IsNullOrWhiteSpace(subjectCode);
 
-                    if (!csv.TryGetField("MSSV", out string mssv) || string.IsNullOrWhiteSpace(mssv))
-                        isValid = false;
-                    if (!csv.TryGetField("SubjectCode", out string subjectCode) || string.IsNullOrWhiteSpace(subjectCode))
-                        isValid = false;
-                    if (!csv.TryGetField("Semester", out string semesterStr) || string.IsNullOrWhiteSpace(semesterStr) || !int.TryParse(semesterStr, out semester))
-                        isValid = false;
-                    if (!csv.TryGetField("Grade", out string gradeStr) || string.IsNullOrWhiteSpace(gradeStr) || !decimal.TryParse(gradeStr, out grade))
-                        isValid = false;
+                        bool validSemester = int.TryParse(semesterStr, out int semester);
+                        bool validGrade = decimal.TryParse(gradeStr, out decimal grade);
 
-                    if (!isValid)
-                    {
-                        invalidRows.Add(rowIndex);
+                        isValid &= validSemester;
+                        isValid &= validGrade;
+
+                        if (!isValid)
+                        {
+                            invalidRows.Add(rowIndex++);
+                            continue;
+                        }
+                        records.Add(new StudentGradeImportDTO
+                        {
+                            MSSV = mssv,
+                            SubjectCode = subjectCode,
+                            Semester = semester,
+                            Grade = grade
+                        });
+
                         rowIndex++;
-                        continue;
+                    }
+                }
+
+                else if (extension == ".xlsx")
+                {
+                    using var stream = file.OpenReadStream();
+                    using var workbook = new XLWorkbook(stream);
+                    var worksheet = workbook.Worksheets.FirstOrDefault();
+                    if (worksheet == null)
+                        return BadRequest(new { message = "Excel file is empty." });
+
+                    var headers = new[] { "MSSV", "SubjectCode", "Semester", "Grade" };
+                    var headerMap = new Dictionary<string, int>();
+
+                    var headerRow = worksheet.Row(1);
+                    for (int col = 1; col <= worksheet.LastColumnUsed().ColumnNumber(); col++)
+                    {
+                        var header = headerRow.Cell(col).GetString().Trim();
+                        if (headers.Contains(header))
+                            headerMap[header] = col;
                     }
 
-                    records.Add(new StudentGradeImportDTO
+                    var missingHeaders = headers.Where(h => !headerMap.ContainsKey(h)).ToList();
+                    if (missingHeaders.Any())
+                        return BadRequest(new { message = "Excel file is missing required columns!", missingColumns = missingHeaders });
+
+                    for (int row = 2; row <= worksheet.LastRowUsed().RowNumber(); row++)
                     {
-                        MSSV = mssv.Trim(),
-                        SubjectCode = subjectCode.Trim(),
-                        Semester = semester,
-                        Grade = grade
-                    });
+                        bool isValid = true;
+                        var rowCells = worksheet.Row(row);
 
-                    rowIndex++;
-                }
+                        string mssv = rowCells.Cell(headerMap["MSSV"]).GetString().Trim();
+                        string subjectCode = rowCells.Cell(headerMap["SubjectCode"]).GetString().Trim();
+                        string semesterStr = rowCells.Cell(headerMap["Semester"]).GetString().Trim();
+                        string gradeStr = rowCells.Cell(headerMap["Grade"]).GetString().Trim();
 
-                if (invalidRows.Any())
-                {
-                    return BadRequest(new
-                    {
-                        message = "Some rows have missing required fields!",
-                        invalidRows = invalidRows
-                    });
-                }
+                        isValid &= !string.IsNullOrWhiteSpace(mssv);
+                        isValid &= !string.IsNullOrWhiteSpace(subjectCode);
+                        isValid &= int.TryParse(semesterStr, out int semester);
+                        isValid &= decimal.TryParse(gradeStr, out decimal grade);
 
-                var mssvList = records.Select(r => r.MSSV).Distinct().ToList();
-                var subjectCodeList = records.Select(r => r.SubjectCode).Distinct().ToList();
+                        if (!isValid)
+                        {
+                            invalidRows.Add(row - 1); // Vì dòng header là dòng 1
+                            continue;
+                        }
 
-                var users = await userRepository.GetUserByMSSVList(mssvList);
-                var curriculums = await curriculumRepository.GetCurriculumBySubjectCodeList(subjectCodeList);
-
-                var userDict = users.ToDictionary(u => u.MSSV, u => u);
-                var curriculumDict = curriculums.ToDictionary(c => c.SubjectCode, c => c);
-
-                var studentGrades = new List<StudentGrade>();
-                var missingUserIds = new List<string>();
-                var missingCurriculumIds = new List<string>();
-
-                foreach (var record in records)
-                {
-                    if (!userDict.TryGetValue(record.MSSV, out var user))
-                    {
-                        missingUserIds.Add(record.MSSV);
-                        continue;
+                        records.Add(new StudentGradeImportDTO
+                        {
+                            MSSV = mssv,
+                            SubjectCode = subjectCode,
+                            Semester = semester,
+                            Grade = grade
+                        });
                     }
-
-                    if (!curriculumDict.TryGetValue(record.SubjectCode, out var curriculum))
-                    {
-                        missingCurriculumIds.Add(record.SubjectCode);
-                        continue;
-                    }
-
-                    studentGrades.Add(new StudentGrade
-                    {
-                        UserId = user.UserId,
-                        CurriculumId = curriculum.CurriculumId,
-                        Semester = record.Semester,
-                        Grade = record.Grade,
-                    });
                 }
-
-                if (missingUserIds.Count > 0 || missingCurriculumIds.Count > 0)
+                else
                 {
-                    return BadRequest(new
-                    {
-                        message = "Some MSSV or SubjectCode does not exist!",
-                        missingUsers = missingUserIds,
-                        missingCurriculums = missingCurriculumIds
-                    });
+                    return BadRequest(new { message = "Unsupported file format. Only CSV and XLSX are allowed." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error while reading file.", error = ex.Message });
+            }
+
+            if (invalidRows.Any())
+            {
+                return BadRequest(new
+                {
+                    message = "Some rows have missing or invalid fields!",
+                    invalidRows = invalidRows
+                });
+            }
+
+            // ✅ Giữ nguyên phần xử lý logic import
+            var mssvList = records.Select(r => r.MSSV).Distinct().ToList();
+            var subjectCodeList = records.Select(r => r.SubjectCode).Distinct().ToList();
+
+            var users = await userRepository.GetUserByMSSVList(mssvList);
+            var curriculums = await curriculumRepository.GetCurriculumBySubjectCodeList(subjectCodeList);
+
+            var userDict = users.ToDictionary(u => u.MSSV, u => u);
+            var curriculumDict = curriculums.ToDictionary(c => c.SubjectCode, c => c);
+
+            var studentGrades = new List<StudentGrade>();
+            var missingUserIds = new List<string>();
+            var missingCurriculumIds = new List<string>();
+
+            foreach (var record in records)
+            {
+                if (!userDict.TryGetValue(record.MSSV, out var user))
+                {
+                    missingUserIds.Add(record.MSSV);
+                    continue;
                 }
 
+                if (!curriculumDict.TryGetValue(record.SubjectCode, out var curriculum))
+                {
+                    missingCurriculumIds.Add(record.SubjectCode);
+                    continue;
+                }
+
+                studentGrades.Add(new StudentGrade
+                {
+                    UserId = user.UserId,
+                    CurriculumId = curriculum.CurriculumId,
+                    Semester = record.Semester,
+                    Grade = record.Grade,
+                });
+            }
+
+            if (missingUserIds.Any() || missingCurriculumIds.Any())
+            {
+                return BadRequest(new
+                {
+                    message = "Some MSSV or SubjectCode does not exist!",
+                    missingUsers = missingUserIds,
+                    missingCurriculums = missingCurriculumIds
+                });
+            }
+
+            try
+            {
                 await studentGradeRepository.ImportStudentGrades(studentGrades);
-
-                return Ok(new { message = "Student Grades CSV imported successfully!", count = studentGrades.Count });
+                return Ok(new
+                {
+                    message = "Student Grades imported successfully!",
+                    count = studentGrades.Count
+                });
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Database update failed. Please check for duplicate records or constraint violations.",
+                    error = ex.InnerException?.Message ?? ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Unexpected error occurred.",
+                    error = ex.Message
+                });
             }
         }
+
+
+
+
+
+
     }
 }

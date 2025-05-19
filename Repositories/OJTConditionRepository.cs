@@ -1,10 +1,5 @@
 ﻿using BusinessObject;
 using DataAccess;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repositories
 {
@@ -15,6 +10,11 @@ namespace Repositories
             var conditions = await OJTConditionDAO.Instance.GetConditionsAsync();
             return double.Parse(conditions["MaxDebtRatio"]);
         }
+        public async Task<IEnumerable<OJTCondition>> GetOJTConditionsAll()
+        {
+            return await OJTConditionDAO.Instance.GetOJTConditionsAll();
+        }
+
 
         public async Task<bool> ShouldCheckFailedSubjectsAsync()
         {

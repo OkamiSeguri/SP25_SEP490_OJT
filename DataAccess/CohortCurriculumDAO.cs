@@ -1,7 +1,5 @@
 ﻿using BusinessObject;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DataAccess
 {
@@ -9,19 +7,20 @@ namespace DataAccess
     {
         public async Task<IEnumerable<CohortCurriculum>> GetCohortCurriculumAll()
         {
-            return await _context.CohortCurriculums.ToListAsync();
+            return await _context.CohortCurriculums.AsNoTracking().ToListAsync();
         }
 
         public async Task<CohortCurriculum> GetCohortCurriculum(string cohort, int curriculumId)
         {
             return await _context.CohortCurriculums
-                .FirstOrDefaultAsync(c => c.Cohort == cohort && c.CurriculumId == curriculumId);
+                .AsNoTracking().FirstOrDefaultAsync(c => c.Cohort == cohort && c.CurriculumId == curriculumId);
         }
         public async Task<List<CohortCurriculum>> GetCohortCurriculumByCohort(List<string> cohort)
         {
             return await _context.CohortCurriculums
                          .Where(c => cohort.Contains(c.Cohort))
-                .ToListAsync(); 
+                         .AsNoTracking()
+                         .ToListAsync();
         }
 
 

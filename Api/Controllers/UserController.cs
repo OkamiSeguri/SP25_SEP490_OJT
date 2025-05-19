@@ -10,6 +10,7 @@ using Services;
 using System.Data;
 using System.Globalization;
 using System.Text;
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace FOMSOData.Controllers
@@ -109,7 +110,7 @@ namespace FOMSOData.Controllers
             });
         }
 
-        [CustomAuthorize("1", "2")]
+        [CustomAuthorize("1", "2", "3")]
         [HttpGet("staff-enter")]
         public async Task<ActionResult> GetUsersWithRole0()
         {
@@ -531,20 +532,28 @@ namespace FOMSOData.Controllers
         }
         [CustomAuthorize("1")]
         [HttpPost("import")]
-        public async Task<IActionResult> ImportUsersCsv(IFormFile file)
+        public async Task<IActionResult> ImportUsersFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "File is empty or missing." });
 
-            using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
-            using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
+            var records = new List<User>();
+            var invalidRows = new List<int>();
+
+            var extension = Path.GetExtension(file.FileName).ToLower();
+
+            if (extension == ".csv")
             {
+                using var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
+                using var csv = new CsvReader(stream, CultureInfo.InvariantCulture);
+
                 csv.Context.RegisterClassMap<UserMap>();
+
                 var requiredHeaders = new List<string> { "MSSV", "FullName", "Email", "Password" };
                 csv.Read();
                 csv.ReadHeader();
-                var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
 
+                var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
                 if (missingHeaders.Any())
                 {
                     return BadRequest(new
@@ -553,15 +562,11 @@ namespace FOMSOData.Controllers
                         missingColumns = missingHeaders
                     });
                 }
-                var records = new List<User>();
-                var invalidRows = new List<int>();
-                int rowIndex = 1; // Bắt đầu từ dòng 1 (bỏ qua header)
 
+                int rowIndex = 1;
                 while (csv.Read())
                 {
-                    var user = new User();
                     bool isValid = true;
-
                     if (!csv.TryGetField("MSSV", out string mssv) || string.IsNullOrWhiteSpace(mssv))
                         isValid = false;
                     if (!csv.TryGetField("FullName", out string fullName) || string.IsNullOrWhiteSpace(fullName))
@@ -588,30 +593,77 @@ namespace FOMSOData.Controllers
 
                     rowIndex++;
                 }
-
-                if (invalidRows.Any())
-                {
-                    return BadRequest(new
-                    {
-                        message = "Some rows have missing required fields!",
-                        invalidRows = invalidRows
-                    });
-                }
-                // Kiểm tra trùng MSSV và Email
-                var (duplicateMSSVs, duplicateEmails) = await userRepository.ImportUsersAsync(records);
-
-                if (duplicateMSSVs.Count > 0 || duplicateEmails.Count > 0)
-                {
-                    return BadRequest(new
-                    {
-                        message = "Some users already exist!",
-                        duplicateMSSVs = duplicateMSSVs,
-                        duplicateEmails = duplicateEmails
-                    });
-                }
-
-                return Ok(new { message = "Users CSV imported successfully!", count = records.Count });
             }
+            else if (extension == ".xlsx")
+            {
+                try
+                {
+                    using var stream = file.OpenReadStream();
+                    using var workbook = new ClosedXML.Excel.XLWorkbook(stream);
+                    var worksheet = workbook.Worksheet(1);
+                    var rows = worksheet.RangeUsed().RowsUsed().Skip(1);
+
+                    int rowIndex = 2;
+                    foreach (var row in rows)
+                    {
+                        var mssv = row.Cell(1).GetString();
+                        var fullName = row.Cell(2).GetString();
+                        var email = row.Cell(3).GetString();
+                        var password = row.Cell(4).GetString();
+
+                        bool isValid = !(string.IsNullOrWhiteSpace(mssv) || string.IsNullOrWhiteSpace(fullName)
+                                         || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password));
+
+                        if (!isValid)
+                        {
+                            invalidRows.Add(rowIndex);
+                            rowIndex++;
+                            continue;
+                        }
+
+                        records.Add(new User
+                        {
+                            MSSV = mssv.Trim(),
+                            FullName = fullName.Trim(),
+                            Email = email.Trim(),
+                            Password = password.Trim(),
+                        });
+
+                        rowIndex++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, new { message = "File contains corrupted data or invalid format.", detail = ex.Message });
+                }
+            }
+            else
+            {
+                return BadRequest(new { message = "Unsupported file format. Please upload CSV or XLSX files only." });
+            }
+
+            if (invalidRows.Any())
+            {
+                return BadRequest(new
+                {
+                    message = "Some rows have missing required fields!",
+                    invalidRows = invalidRows
+                });
+            }
+
+            var (duplicateMSSVs, duplicateEmails) = await userRepository.ImportUsersAsync(records);
+
+            if (duplicateMSSVs.Count > 0 || duplicateEmails.Count > 0)
+            {
+                return BadRequest(new
+                {
+                    message = "Some users already exist!",
+                    duplicateMSSVs = duplicateMSSVs,
+                    duplicateEmails = duplicateEmails
+                });
+            }
+
+            return Ok(new { message = $"Users {extension.ToUpper().Trim('.')} imported successfully!", count = records.Count });
         }
 
     }

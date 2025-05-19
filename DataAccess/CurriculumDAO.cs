@@ -1,10 +1,5 @@
 ﻿using BusinessObject;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess
 {
@@ -12,23 +7,23 @@ namespace DataAccess
     {
         public async Task<IEnumerable<Curriculum>> GetCurriculumAll()
         {
-            return await _context.Curriculums.ToListAsync();
+            return await _context.Curriculums.AsNoTracking().ToListAsync();
         }
         public async Task<Curriculum> GetCurriculumById(int id)
         {
-            var curriculum = await _context.Curriculums.FirstOrDefaultAsync(c => c.CurriculumId == id);
+            var curriculum = await _context.Curriculums.AsNoTracking().FirstOrDefaultAsync(c => c.CurriculumId == id);
             if (curriculum == null) return null; return curriculum;
-        }     
+        }
         public async Task<Curriculum> GetCurriculumBySubjectCode(string sc)
         {
-            var curriculum = await _context.Curriculums.FirstOrDefaultAsync(c => c.SubjectCode == sc);
+            var curriculum = await _context.Curriculums.AsNoTracking().FirstOrDefaultAsync(c => c.SubjectCode == sc);
             if (curriculum == null) return null; return curriculum;
         }
         public async Task<List<Curriculum>> GetCurriculumBySubjectCodeList(List<string> subjectCodes)
         {
             return await _context.Curriculums
                 .Where(c => subjectCodes.Contains(c.SubjectCode))
-                .AsNoTracking() 
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task Create(Curriculum curriculum)
@@ -56,9 +51,9 @@ namespace DataAccess
         }
         public async Task<List<string>> ImportCurriculumsAsync(IEnumerable<Curriculum> curriculums)
         {
-            var existingCurriculums = await _context.Curriculums.ToListAsync(); 
+            var existingCurriculums = await _context.Curriculums.ToListAsync();
             var existingSubjectCodes = existingCurriculums.Select(c => c.SubjectCode).ToHashSet();
-            var existingIds = existingCurriculums.Select(c => c.CurriculumId).ToHashSet(); 
+            var existingIds = existingCurriculums.Select(c => c.CurriculumId).ToHashSet();
 
             List<string> duplicateSubjectCodes = new List<string>();
 
@@ -73,22 +68,22 @@ namespace DataAccess
                 {
                     if (existingSubjectCodes.Contains(curriculum.SubjectCode))
                     {
-                        duplicateSubjectCodes.Add(curriculum.SubjectCode); 
+                        duplicateSubjectCodes.Add(curriculum.SubjectCode);
                     }
                     else
                     {
-                        await _context.Curriculums.AddAsync(curriculum); 
+                        await _context.Curriculums.AddAsync(curriculum);
                     }
                 }
             }
 
             if (duplicateSubjectCodes.Count > 0)
             {
-                return duplicateSubjectCodes; 
+                return duplicateSubjectCodes;
             }
 
-            await _context.SaveChangesAsync(); 
-            return new List<string>(); 
+            await _context.SaveChangesAsync();
+            return new List<string>();
         }
 
 

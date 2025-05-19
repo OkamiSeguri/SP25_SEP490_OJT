@@ -14,7 +14,7 @@ namespace FOMSOData.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [CustomAuthorize("1", "2", "3")]
+    [CustomAuthorize("1")]
 
     public class StudentProfileController : ControllerBase
     {
@@ -95,7 +95,7 @@ namespace FOMSOData.Controllers
         public async Task<ActionResult<StudentProfile>> GetStudentProfile(int id)
         {
 
-            var student = await studentProfileRepository.GetStudentProfileById(id);
+            var student = await studentProfileRepository.GetStudentProfileByUserId(id);
             if (student == null)
             {
                 return NotFound(new { code = 404, detail = "Student profile not found" });
@@ -207,54 +207,104 @@ namespace FOMSOData.Controllers
         public async Task<ActionResult> Delete(int id)
         {
 
-            var exist = await studentProfileRepository.GetStudentProfileById(id);
+            var exist = await studentProfileRepository.GetStudentProfileByUserId(id);
             if (exist == null)
             {
                 return NotFound(new { code = 404, detail = "Student profile not found" });
             }
 
-            await studentProfileRepository.Delete(id);
+            await studentProfileRepository.DeleteByUserId(id);
             return Ok(new { status = 200, message = "Delete Success" });
         }
 
 
         [HttpPost("import")]
-        public async Task<IActionResult> ImportCsv(IFormFile file)
+        public async Task<IActionResult> ImportFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "File is empty or missing." });
 
+            var extension = Path.GetExtension(file.FileName).ToLower();
+            var records = new List<StudentProfileImportDTO>();
+            var invalidRows = new List<int>();
+
             try
             {
-                using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
-                using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
+                if (extension == ".csv")
                 {
-                    csv.Context.RegisterClassMap<StudentProfileMap>();
-                    csv.Read();
-                    csv.ReadHeader();
-                    var requiredHeaders = new List<string> { "MSSV", "Cohort" };
-                    var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
+                    using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
+                    using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
+                    {
+                        csv.Context.RegisterClassMap<StudentProfileMap>();
 
-                    if (missingHeaders.Any())
+                        csv.Read();
+                        csv.ReadHeader();
+
+                        var requiredHeaders = new List<string> { "MSSV", "Cohort" };
+                        var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
+                        if (missingHeaders.Any())
+                        {
+                            return BadRequest(new
+                            {
+                                message = "CSV file is missing required columns!",
+                                missingColumns = missingHeaders
+                            });
+                        }
+
+                        int rowIndex = 1;
+                        while (csv.Read())
+                        {
+                            bool isValid = true;
+                            if (!csv.TryGetField("MSSV", out string mssv) || string.IsNullOrWhiteSpace(mssv))
+                                isValid = false;
+                            if (!csv.TryGetField("Cohort", out string cohort) || string.IsNullOrWhiteSpace(cohort))
+                                isValid = false;
+
+                            if (!isValid)
+                            {
+                                invalidRows.Add(rowIndex);
+                                rowIndex++;
+                                continue;
+                            }
+
+                            records.Add(new StudentProfileImportDTO
+                            {
+                                MSSV = mssv.Trim(),
+                                Cohort = cohort.Trim()
+                            });
+
+                            rowIndex++;
+                        }
+                    }
+                }
+                else if (extension == ".xlsx")
+                {
+                    using var stream = file.OpenReadStream();
+                    using var workbook = new ClosedXML.Excel.XLWorkbook(stream);
+                    var worksheet = workbook.Worksheet(1);
+
+                    var headerMSSV = worksheet.Cell(1, 1).GetString().Trim();
+                    var headerCohort = worksheet.Cell(1, 2).GetString().Trim();
+                    var requiredHeaders = new List<string> { "MSSV", "Cohort" };
+
+                    if (headerMSSV != "MSSV" || headerCohort != "Cohort")
                     {
                         return BadRequest(new
                         {
-                            message = "CSV file is missing required columns!",
-                            missingColumns = missingHeaders
+                            message = "XLSX file is missing required columns or wrong header names!",
+                            missingColumns = requiredHeaders
                         });
                     }
 
-                    var records = new List<StudentProfileImportDTO>();
-                    var invalidRows = new List<int>();
-                    int rowIndex = 1;
+                    var rows = worksheet.RangeUsed().RowsUsed().Skip(1);
 
-                    while (csv.Read())
+                    int rowIndex = 2;
+                    foreach (var row in rows)
                     {
-                        bool isValid = true;
-                        if (!csv.TryGetField("MSSV", out string mssv) || string.IsNullOrWhiteSpace(mssv))
-                            isValid = false;
-                        if (!csv.TryGetField("Cohort", out string cohort) || string.IsNullOrWhiteSpace(cohort))
-                            isValid = false;
+                        var mssv = row.Cell(1).GetString();
+                        var cohort = row.Cell(2).GetString();
+
+                        bool isValid = !(string.IsNullOrWhiteSpace(mssv) || string.IsNullOrWhiteSpace(cohort));
 
                         if (!isValid)
                         {
@@ -271,93 +321,98 @@ namespace FOMSOData.Controllers
 
                         rowIndex++;
                     }
-
-                    if (invalidRows.Any())
-                    {
-                        return BadRequest(new
-                        {
-                            message = "Some rows have missing required fields!",
-                            invalidRows = invalidRows
-                        });
-                    }
-
-                    var mssvList = records.Select(r => r.MSSV).Distinct().ToList();
-                    var cohortList = records.Select(r => r.Cohort).Distinct().ToList();
-
-                    var users = await userRepository.GetUserByMSSVList(mssvList);
-                    var userIds = users.Select(u => u.UserId).ToList();
-                    var cohorts = await cohortCurriculumRepository.GetCohortCurriculumByCohort(cohortList);
-                    var existingProfiles = await studentProfileRepository.GetStudentProfilesByUserIds(userIds);
-
-                    var userDict = users.ToDictionary(u => u.MSSV, u => u);
-                    var cohortDict = cohorts.GroupBy(c => c.Cohort)
-                                            .ToDictionary(g => g.Key, g => g.ToList());
-                    var existingProfilesDict = existingProfiles.ToDictionary(sp => sp.UserId, sp => sp);
-
-                    var studentProfiles = new List<StudentProfile>();
-                    var studentGrades = new List<StudentGrade>();
-                    var missingUserIds = new List<string>();
-                    var missingCohorts = new List<string>();
-
-                    foreach (var record in records)
-                    {
-                        if (!userDict.TryGetValue(record.MSSV, out var user))
-                        {
-                            missingUserIds.Add(record.MSSV);
-                            continue;
-                        }
-
-                        if (!cohortDict.TryGetValue(record.Cohort, out var cohortCurriculums))
-                        {
-                            missingCohorts.Add(record.Cohort);
-                            continue;
-                        }
-
-                        if (existingProfilesDict.TryGetValue(user.UserId, out var existingProfile))
-                        {
-                            await studentGradeRepository.DeleteByUserId(existingProfile.UserId);
-                            await studentProfileRepository.DeleteByUserId(existingProfile.UserId);
-                        }
-
-                        var studentProfile = new StudentProfile
-                        {
-                            UserId = user.UserId,
-                            Cohort = record.Cohort,
-                            TotalCredits = 0,
-                            DebtCredits = 0
-                        };
-
-                        studentProfiles.Add(studentProfile);
-
-                        studentGrades.AddRange(cohortCurriculums.Select(cc => new StudentGrade
-                        {
-                            UserId = user.UserId,
-                            CurriculumId = cc.CurriculumId,
-                            Semester = cc.Semester,
-                            Grade = 0,
-                            IsPassed = 0
-                        }));
-                    }
-
-                    if (missingUserIds.Count > 0 || missingCohorts.Count > 0)
-                    {
-                        return BadRequest(new
-                        {
-                            message = "Some MSSV or Cohort does not exist!",
-                            missingUsers = missingUserIds,
-                            missingCohorts = missingCohorts
-                        });
-                    }
-
-                    await studentProfileRepository.ImportStudentProfilesAsync(studentProfiles);
-
-                    if (studentGrades.Any())
-                    {
-                        await studentGradeRepository.CreateMultiple(studentGrades);
-                    }
-
-                    return Ok(new { message = "Student Profiles CSV imported successfully!", count = studentProfiles.Count });
                 }
+                else
+                {
+                    return BadRequest(new { message = "Unsupported file format. Please upload CSV or XLSX files only." });
+                }
+
+                if (invalidRows.Any())
+                {
+                    return BadRequest(new
+                    {
+                        message = "Some rows have missing required fields!",
+                        invalidRows = invalidRows
+                    });
+                }
+
+
+                var mssvList = records.Select(r => r.MSSV).Distinct().ToList();
+                var cohortList = records.Select(r => r.Cohort).Distinct().ToList();
+
+                var users = await userRepository.GetUserByMSSVList(mssvList);
+                var userIds = users.Select(u => u.UserId).ToList();
+                var cohorts = await cohortCurriculumRepository.GetCohortCurriculumByCohort(cohortList);
+                var existingProfiles = await studentProfileRepository.GetStudentProfilesByUserIds(userIds);
+
+                var userDict = users.ToDictionary(u => u.MSSV, u => u);
+                var cohortDict = cohorts.GroupBy(c => c.Cohort)
+                                        .ToDictionary(g => g.Key, g => g.ToList());
+                var existingProfilesDict = existingProfiles.ToDictionary(sp => sp.UserId, sp => sp);
+
+                var studentProfiles = new List<StudentProfile>();
+                var studentGrades = new List<StudentGrade>();
+                var missingUserIds = new List<string>();
+                var missingCohorts = new List<string>();
+
+                foreach (var record in records)
+                {
+                    if (!userDict.TryGetValue(record.MSSV, out var user))
+                    {
+                        missingUserIds.Add(record.MSSV);
+                        continue;
+                    }
+
+                    if (!cohortDict.TryGetValue(record.Cohort, out var cohortCurriculums))
+                    {
+                        missingCohorts.Add(record.Cohort);
+                        continue;
+                    }
+
+                    if (existingProfilesDict.TryGetValue(user.UserId, out var existingProfile))
+                    {
+                        await studentGradeRepository.DeleteByUserId(existingProfile.UserId);
+                        await studentProfileRepository.DeleteByUserId(existingProfile.UserId);
+                    }
+
+                    var studentProfile = new StudentProfile
+                    {
+                        UserId = user.UserId,
+                        Cohort = record.Cohort,
+                        TotalCredits = 0,
+                        DebtCredits = 0
+                    };
+
+                    studentProfiles.Add(studentProfile);
+
+                    studentGrades.AddRange(cohortCurriculums.Select(cc => new StudentGrade
+                    {
+                        UserId = user.UserId,
+                        CurriculumId = cc.CurriculumId,
+                        Semester = cc.Semester,
+                        Grade = 0,
+                        IsPassed = 0
+                    }));
+                }
+
+                if (missingUserIds.Count > 0 || missingCohorts.Count > 0)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Some MSSV or Cohort does not exist!",
+                        missingUsers = missingUserIds,
+                        missingCohorts = missingCohorts
+                    });
+                }
+
+                await studentProfileRepository.ImportStudentProfilesAsync(studentProfiles);
+
+                if (studentGrades.Any())
+                {
+                    await studentGradeRepository.CreateMultiple(studentGrades);
+                }
+
+                return Ok(new { message = "Student Profiles imported successfully!", count = studentProfiles.Count });
             }
             catch (DbUpdateException ex)
             {
@@ -376,6 +431,11 @@ namespace FOMSOData.Controllers
                 });
             }
         }
+
+
+
+
+
 
     }
 }

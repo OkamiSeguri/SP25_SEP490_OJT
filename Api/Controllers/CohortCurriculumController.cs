@@ -2,12 +2,10 @@
 using CsvHelper;
 using FOMSOData.Authorize;
 using FOMSOData.Mappings;
-using Microsoft.AspNetCore.Authorization;
+using FOMSOData.Models;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using System.Globalization;
-using System.Linq;
-using System.Security.Claims;
 using System.Text;
 
 namespace FOMSOData.Controllers
@@ -125,45 +123,93 @@ namespace FOMSOData.Controllers
             return Ok(new { message = "Delete Success", status = StatusCodes.Status200OK });
         }
 
-        // 🔹 IMPORT CSV
         [HttpPost("import")]
-        public async Task<IActionResult> ImportCohortCurriculumCsv(IFormFile file)
+        public async Task<IActionResult> ImportCohortCurriculumFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "File is empty or missing." });
 
-            using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
-            using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
+            var extension = Path.GetExtension(file.FileName).ToLower();
+            var importRecords = new List<CohortCurriculumImportDTO>();
+            var invalidRows = new List<int>();
+
+            if (extension == ".csv")
             {
+                using var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
+                using var csv = new CsvReader(stream, CultureInfo.InvariantCulture);
                 csv.Context.RegisterClassMap<CohortCurriculumMap>();
                 csv.Read();
                 csv.ReadHeader();
-                var requiredHeaders = new List<string> { "Cohort", "CurriculumId" };
+
+                var requiredHeaders = new List<string> { "Cohort", "SubjectCode", "Semester" };
                 var missingHeaders = requiredHeaders.Where(h => !csv.HeaderRecord.Contains(h)).ToList();
-
                 if (missingHeaders.Any())
-                {
-                    return BadRequest(new
-                    {
-                        message = "CSV file is missing required columns!",
-                        missingColumns = missingHeaders
-                    });
-                }
+                    return BadRequest(new { message = "Missing required headers", missingColumns = missingHeaders });
 
-                var records = new List<CohortCurriculum>();
-                var invalidRows = new List<int>();
                 int rowIndex = 1;
-
                 while (csv.Read())
                 {
                     bool isValid = true;
-                    int curriculumId = 0;
 
-                    if (!csv.TryGetField("Cohort", out string cohort) || string.IsNullOrWhiteSpace(cohort))
+                    string cohort = null;
+                    string subjectCode = null;
+                    int semester = 0;
+
+                    if (!csv.TryGetField("Cohort", out cohort) || string.IsNullOrWhiteSpace(cohort))
                         isValid = false;
-                    if (!csv.TryGetField("CurriculumId", out string curriculumIdStr) ||
-                        string.IsNullOrWhiteSpace(curriculumIdStr) ||
-                        !int.TryParse(curriculumIdStr, out curriculumId))
+
+                    if (!csv.TryGetField("SubjectCode", out subjectCode) || string.IsNullOrWhiteSpace(subjectCode))
+                        isValid = false;
+
+                    if (!csv.TryGetField("Semester", out string semesterStr) || !int.TryParse(semesterStr, out semester))
+                        isValid = false;
+
+                    if (!isValid)
+                    {
+                        invalidRows.Add(rowIndex++);
+                        continue;
+                    }
+
+                    importRecords.Add(new CohortCurriculumImportDTO
+                    {
+                        Cohort = cohort.Trim(),
+                        SubjectCode = subjectCode.Trim(),
+                        Semester = semester
+                    });
+
+                    rowIndex++;
+                }
+            }
+            else if (extension == ".xlsx")
+            {
+                using var workbook = new ClosedXML.Excel.XLWorkbook(file.OpenReadStream());
+                var worksheet = workbook.Worksheets.First();
+                var requiredHeaders = new List<string> { "Cohort", "SubjectCode", "Semester" };
+
+                // Lấy header từ dòng 1
+                var headers = worksheet.Row(1).CellsUsed().Select(c => c.GetString().Trim()).ToList();
+                var missingHeaders = requiredHeaders.Where(h => !headers.Contains(h)).ToList();
+                if (missingHeaders.Any())
+                    return BadRequest(new { message = "Missing required headers", missingColumns = missingHeaders });
+
+                int rowIndex = 2; // bắt đầu từ dòng dữ liệu thứ 2
+                while (true)
+                {
+                    var row = worksheet.Row(rowIndex);
+                    if (row.IsEmpty())
+                        break; // hết dữ liệu
+
+                    string cohort = row.Cell(headers.IndexOf("Cohort") + 1).GetString();
+                    string subjectCode = row.Cell(headers.IndexOf("SubjectCode") + 1).GetString();
+                    string semesterStr = row.Cell(headers.IndexOf("Semester") + 1).GetString();
+
+                    bool isValid = true;
+                    if (string.IsNullOrWhiteSpace(cohort))
+                        isValid = false;
+                    if (string.IsNullOrWhiteSpace(subjectCode))
+                        isValid = false;
+
+                    if (!int.TryParse(semesterStr, out int semester))
                         isValid = false;
 
                     if (!isValid)
@@ -173,39 +219,47 @@ namespace FOMSOData.Controllers
                         continue;
                     }
 
-                    records.Add(new CohortCurriculum
+                    importRecords.Add(new CohortCurriculumImportDTO
                     {
                         Cohort = cohort.Trim(),
-                        CurriculumId = curriculumId
+                        SubjectCode = subjectCode.Trim(),
+                        Semester = semester
                     });
 
                     rowIndex++;
                 }
-
-                if (invalidRows.Any())
-                {
-                    return BadRequest(new
-                    {
-                        message = "Some rows have missing required fields!",
-                        invalidRows = invalidRows
-                    });
-                }
-
-                var existingCurriculumIds = (await curriculumRepository.GetAllIds()).ToHashSet();
-                var invalidRecords = records.Where(r => !existingCurriculumIds.Contains(r.CurriculumId)).ToList();
-                if (invalidRecords.Any())
-                {
-                    return BadRequest(new
-                    {
-                        message = "CurriculumId does not exist in the system.",
-                        invalidCurriculumIds = invalidRecords.Select(r => r.CurriculumId).Distinct()
-                    });
-                }
-
-                await cohortCurriculumRepository.ImportCohortCurriculum(records);
-                return Ok(new { message = "Cohort Curriculum CSV imported successfully!", count = records.Count });
             }
+            else
+            {
+                return BadRequest(new { message = "Unsupported file format. Please upload CSV or XLSX." });
+            }
+
+            if (invalidRows.Any())
+            {
+                return BadRequest(new { message = "Invalid rows", invalidRows });
+            }
+
+            var subjectCodes = importRecords.Select(r => r.SubjectCode).Distinct().ToList();
+            var curriculums = await curriculumRepository.GetCurriculumBySubjectCodeList(subjectCodes);
+            var curriculumDict = curriculums.ToDictionary(c => c.SubjectCode, c => c.CurriculumId);
+
+            var missingSubjectCodes = subjectCodes.Where(code => !curriculumDict.ContainsKey(code)).ToList();
+            if (missingSubjectCodes.Any())
+            {
+                return BadRequest(new { message = "SubjectCode not found", missingSubjectCodes });
+            }
+
+            var cohortCurriculums = importRecords.Select(r => new CohortCurriculum
+            {
+                Cohort = r.Cohort,
+                CurriculumId = curriculumDict[r.SubjectCode],
+                Semester = r.Semester
+            }).ToList();
+
+            await cohortCurriculumRepository.ImportCohortCurriculum(cohortCurriculums);
+            return Ok(new { message = "Import successful", count = cohortCurriculums.Count });
         }
+
 
     }
 }

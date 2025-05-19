@@ -616,6 +616,18 @@
         }
       }
     },
+    "/api/OJTCondition": {
+      "get": {
+        "tags": [
+          "OJTCondition"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/OJTCondition/check/{userId}": {
       "get": {
         "tags": [
@@ -3325,6 +3337,10 @@
             "nullable": true
           },
           "givenBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "mssv": {
             "type": "string",
             "nullable": true
           },
