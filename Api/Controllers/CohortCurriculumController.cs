@@ -73,25 +73,52 @@ namespace FOMSOData.Controllers
 
         // 🔹 CREATE CohortCurriculum
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] CohortCurriculum cohortCurriculum)
+        public async Task<ActionResult> Post([FromBody] CohortCurriculumImportDTO dto)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || dto.Semester <= 0)
             {
-                return BadRequest(new { code = 400, detail = "Invalid request data." });
+                return BadRequest(new { code = 400, detail = "Invalid request data. Semester must be greater than 0." });
             }
 
+            var curriculum = await curriculumRepository.GetCurriculumBySubjectCode(dto.SubjectCode);
+            if (curriculum == null)
+            {
+                return NotFound(new { code = 404, detail = "Not found with given subjectCode." });
+            }
+
+            var existing = await cohortCurriculumRepository
+                .GetCohortCurriculum(dto.Cohort, curriculum.CurriculumId);
+
+            if (existing != null)
+            {
+                return Conflict(new
+                {
+                    code = 409,
+                    detail = "CohortCurriculum already exists with the same Cohort and CurriculumId."
+                });
+            }
+
+            var cohortCurriculum = new CohortCurriculum
+            {
+                Cohort = dto.Cohort,
+                CurriculumId = curriculum.CurriculumId,
+                Semester = dto.Semester
+            };
+
             await cohortCurriculumRepository.Create(cohortCurriculum);
+
             return Ok(new
             {
                 result = new
                 {
                     cohort = cohortCurriculum.Cohort,
-                    curriculumId = cohortCurriculum.CurriculumId,
+                    subjectCode = dto.SubjectCode,
                     semester = cohortCurriculum.Semester,
                 },
                 status = StatusCodes.Status200OK
             });
         }
+
 
         // 🔹 UPDATE CohortCurriculum
         [HttpPut("{cohort}/{curriculumId}")]

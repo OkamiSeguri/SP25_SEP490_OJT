@@ -72,15 +72,26 @@ namespace FOMSOData.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Curriculum curriculum)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
 
-                await curriculumRepository.Create(curriculum);
-                return Ok(new {  result = curriculum, status = 200});
+            // Check xem SubjectCode đã tồn tại chưa
+            var existingCurriculum = await curriculumRepository.GetCurriculumBySubjectCode(curriculum.SubjectCode);
+            if (existingCurriculum != null)
+            {
+                return BadRequest(new
+                {
+                    code = 400,
+                    detail = $"SubjectCode '{curriculum.SubjectCode}' already exists."
+                });
             }
+
+            await curriculumRepository.Create(curriculum);
+            return Ok(new { result = curriculum, status = 200 });
+        }
+
 
 
         [HttpPut("{id}")]

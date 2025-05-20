@@ -58,40 +58,43 @@ namespace FOMSOData.Controllers
 
             var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
 
-                var result = grade.Select(g =>
+            var result = grade.Select(g =>
+            {
+                var maxSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Max(cc => cc.Semester);
+
+                var minSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Min(cc => (int?)cc.Semester) ?? 0;
+
+                int slowBy = g.Semester - maxSemester;
+                int fastBy = minSemester - g.Semester;
+
+                bool isSlowStudy = slowBy > 0;
+                bool isFastStudy = fastBy > 0;
+
+                return new
                 {
-
-                    var maxSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Select(cc => cc.Semester)
-                        .DefaultIfEmpty(0) 
-                        .Max();
-                    var minSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Select(cc => cc.Semester)
-                        .DefaultIfEmpty(0)
-                        .Min();
-
-                    int slowBy = g.Semester - maxSemester;  
-                    int fastBy = minSemester - g.Semester;  
-
-                    bool isSlowStudy = slowBy > 0;
-                    bool isFastStudy = fastBy > 0;
-
-
-                    return new
+                    userId = g.UserId,
+                    curriculumId = g.CurriculumId,
+                    semester = g.Semester,
+                    grade = g.Grade,
+                    isPassed = g.IsPassed,
+                    status = isSlowStudy
+                        ? $"Slow study by {slowBy} semesters"
+                        : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal"),
+                    curriculum = g.Curriculum == null ? null : new
                     {
-                        mssv = userDict.ContainsKey(g.UserId) ? userDict[g.UserId] : "Unknown",
-                        subjectCode = curriculumDict.ContainsKey(g.CurriculumId) ? curriculumDict[g.CurriculumId] : "Unknown",
-                        semester = g.Semester,
-                        grade = g.Grade,
-                        ispass = g.IsPassed,
-                        status = isSlowStudy
-                    ? $"Slow study by {slowBy} semesters"
-                    : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
-                    };
-                });
-                return Ok(new
+                        curriculumId = g.Curriculum.CurriculumId,
+                        subjectCode = g.Curriculum.SubjectCode,
+                        subjectName = g.Curriculum.SubjectName,
+                        credits = g.Curriculum.Credits,
+                        isMandatory = g.Curriculum.IsMandatory
+                    }
+                };
+            });
+            return Ok(new
                 {
                     results = result,
                     status = StatusCodes.Status200OK
@@ -107,6 +110,10 @@ namespace FOMSOData.Controllers
             {
                 return Unauthorized(new { code = 401, detail = "Invalid or missing authentication token" });
             }
+            var users = await userRepository.GetUserAll();
+            var userDict = users.ToDictionary(u => u.UserId, u => u.MSSV);
+            var curriculums = await curriculumRepository.GetCurriculumAll();
+            var curriculumDict = curriculums.ToDictionary(c => c.CurriculumId, c => c.SubjectCode);
             var grades = await studentGradeRepository.GetGradeByUserId(userId);
                 var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
 
@@ -129,35 +136,43 @@ namespace FOMSOData.Controllers
                 });
             }
             var result = grades.Select(g =>
+            {
+                var maxSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Max(cc => cc.Semester);
+
+                var minSemester = cohorts
+                    .Where(cc => cc.CurriculumId == g.CurriculumId)
+                    .Min(cc => (int?)cc.Semester) ?? 0;
+
+                int slowBy = g.Semester - maxSemester;
+                int fastBy = minSemester - g.Semester;
+
+                bool isSlowStudy = slowBy > 0;
+                bool isFastStudy = fastBy > 0;
+
+                return new
                 {
-                    // Lấy semester tối đa của curriculum trong cohort
-                    var maxSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Max(cc => cc.Semester);
-
-                    var minSemester = cohorts
-                        .Where(cc => cc.CurriculumId == g.CurriculumId)
-                        .Min(cc => (int?)cc.Semester) ?? 0;
-                    int slowBy = g.Semester - maxSemester;
-                    int fastBy = minSemester - g.Semester;
-
-                    bool isSlowStudy = slowBy > 0;
-                    bool isFastStudy = fastBy > 0;
-
-
-                    return new
+                    userId = g.UserId,
+                    curriculumId = g.CurriculumId,
+                    semester = g.Semester,
+                    grade = g.Grade,
+                    isPassed = g.IsPassed,
+                    status = isSlowStudy
+                        ? $"Slow study by {slowBy} semesters"
+                        : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal"),
+                    curriculum = g.Curriculum == null ? null : new
                     {
-                        userId = g.UserId,
-                        curriculumId = g.CurriculumId,
-                        semester = g.Semester,
-                        grade = g.Grade,
-                        ispass = g.IsPassed,
-                        status = isSlowStudy
-                    ? $"Slow study by {slowBy} semesters"
-                    : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
-                    };
-                });
-                return Ok(new
+                        curriculumId = g.Curriculum.CurriculumId,
+                        subjectCode = g.Curriculum.SubjectCode,
+                        subjectName = g.Curriculum.SubjectName,
+                        credits = g.Curriculum.Credits,
+                        isMandatory = g.Curriculum.IsMandatory
+                    }
+                };
+            });
+
+            return Ok(new
                 {
                     results = result,
                     status = StatusCodes.Status200OK

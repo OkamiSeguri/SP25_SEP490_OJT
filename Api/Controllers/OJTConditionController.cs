@@ -32,6 +32,7 @@ namespace FOMSOData.Controllers
 
             var result = conditions.Select(c => new
             {
+                id = c.ConditionId,
                 key = c.ConditionKey,
                 value = c.ConditionValue,
             }).ToList();
@@ -103,14 +104,28 @@ namespace FOMSOData.Controllers
             });
         }
 
-
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCondition([FromBody] ConditionUpdateRequestDTO request)
         {
+            if (request.Key == "MaxDebtRatio")
+            {
+                if (!double.TryParse(request.Value, out double value) || value <= 0 || value >= 1)
+                {
+                    return BadRequest(new { message = "MaxDebtRatio must be a number greater than 0 and less than 1." });
+                }
+
+                var parts = request.Value.Split('.');
+                if (parts.Length == 2 && parts[1].Length > 2)
+                {
+                    return BadRequest(new { message = "MaxDebtRatio must have at most 2 decimal places." });
+                }
+            }
+
             await ojtConditionRepository.UpdateConditionAsync(request.Key, request.Value);
             return Ok(new { message = "Condition updated successfully." });
         }
 
-    
+
+
     }
 }
