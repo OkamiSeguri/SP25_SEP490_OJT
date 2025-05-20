@@ -57,17 +57,13 @@ namespace FOMSOData.Controllers
 
             var result = grade.Select(g =>
             {
-
                 var maxSemester = cohorts
                     .Where(cc => cc.CurriculumId == g.CurriculumId)
-                    .Select(cc => cc.Semester)
-                    .DefaultIfEmpty(0)
-                    .Max();
+                    .Max(cc => cc.Semester);
+
                 var minSemester = cohorts
                     .Where(cc => cc.CurriculumId == g.CurriculumId)
-                    .Select(cc => cc.Semester)
-                    .DefaultIfEmpty(0)
-                    .Min();
+                    .Min(cc => (int?)cc.Semester) ?? 0;
 
                 int slowBy = g.Semester - maxSemester;
                 int fastBy = minSemester - g.Semester;
@@ -75,17 +71,24 @@ namespace FOMSOData.Controllers
                 bool isSlowStudy = slowBy > 0;
                 bool isFastStudy = fastBy > 0;
 
-
                 return new
                 {
-                    mssv = userDict.ContainsKey(g.UserId) ? userDict[g.UserId] : "Unknown",
-                    subjectCode = curriculumDict.ContainsKey(g.CurriculumId) ? curriculumDict[g.CurriculumId] : "Unknown",
+                    userId = g.UserId,
+                    curriculumId = g.CurriculumId,
                     semester = g.Semester,
                     grade = g.Grade,
-                    ispass = g.IsPassed,
+                    isPassed = g.IsPassed,
                     status = isSlowStudy
-                ? $"Slow study by {slowBy} semesters"
-                : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
+                        ? $"Slow study by {slowBy} semesters"
+                        : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal"),
+                    curriculum = g.Curriculum == null ? null : new
+                    {
+                        curriculumId = g.Curriculum.CurriculumId,
+                        subjectCode = g.Curriculum.SubjectCode,
+                        subjectName = g.Curriculum.SubjectName,
+                        credits = g.Curriculum.Credits,
+                        isMandatory = g.Curriculum.IsMandatory
+                    }
                 };
             });
             return Ok(new
@@ -104,6 +107,10 @@ namespace FOMSOData.Controllers
             {
                 return Unauthorized(new { code = 401, detail = "Invalid or missing authentication token" });
             }
+            var users = await userRepository.GetUserAll();
+            var userDict = users.ToDictionary(u => u.UserId, u => u.MSSV);
+            var curriculums = await curriculumRepository.GetCurriculumAll();
+            var curriculumDict = curriculums.ToDictionary(c => c.CurriculumId, c => c.SubjectCode);
             var grades = await studentGradeRepository.GetGradeByUserId(userId);
             var cohorts = await cohortCurriculumRepository.GetCohortCurriculumAll();
 
@@ -125,10 +132,6 @@ namespace FOMSOData.Controllers
                     detail = "You do not have permission"
                 });
             }
-            var users = await userRepository.GetUserAll();
-            var userDict = users.ToDictionary(u => u.UserId, u => u.MSSV);
-            var curriculums = await curriculumRepository.GetCurriculumAll();
-            var curriculumDict = curriculums.ToDictionary(c => c.CurriculumId, c => c.SubjectCode);
             var result = grades.Select(g =>
             {
                 var maxSemester = cohorts
@@ -138,25 +141,34 @@ namespace FOMSOData.Controllers
                 var minSemester = cohorts
                     .Where(cc => cc.CurriculumId == g.CurriculumId)
                     .Min(cc => (int?)cc.Semester) ?? 0;
+
                 int slowBy = g.Semester - maxSemester;
                 int fastBy = minSemester - g.Semester;
 
                 bool isSlowStudy = slowBy > 0;
                 bool isFastStudy = fastBy > 0;
 
-
                 return new
                 {
-                    mssv = userDict.ContainsKey(g.UserId) ? userDict[g.UserId] : "Unknown",
-                    subjectCode = curriculumDict.ContainsKey(g.CurriculumId) ? curriculumDict[g.CurriculumId] : "Unknown",
+                    userId = g.UserId,
+                    curriculumId = g.CurriculumId,
                     semester = g.Semester,
                     grade = g.Grade,
-                    ispass = g.IsPassed,
+                    isPassed = g.IsPassed,
                     status = isSlowStudy
-                ? $"Slow study by {slowBy} semesters"
-                : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal")
+                        ? $"Slow study by {slowBy} semesters"
+                        : (isFastStudy ? $"Fast study by {fastBy} semesters" : "Normal"),
+                    curriculum = g.Curriculum == null ? null : new
+                    {
+                        curriculumId = g.Curriculum.CurriculumId,
+                        subjectCode = g.Curriculum.SubjectCode,
+                        subjectName = g.Curriculum.SubjectName,
+                        credits = g.Curriculum.Credits,
+                        isMandatory = g.Curriculum.IsMandatory
+                    }
                 };
             });
+
             return Ok(new
             {
                 results = result,
@@ -270,6 +282,7 @@ namespace FOMSOData.Controllers
 
             studentGrade.UserId = userId;
             studentGrade.CurriculumId = curriculumId;
+            studentGrade.IsPassed = studentGrade.Grade >= 5 ? 1 : 0;
 
             await studentGradeRepository.Update(studentGrade);
 
@@ -417,7 +430,7 @@ namespace FOMSOData.Controllers
 
                         if (!isValid)
                         {
-                            invalidRows.Add(row - 1); // Vì dòng header là dòng 1
+                            invalidRows.Add(row - 1);
                             continue;
                         }
 

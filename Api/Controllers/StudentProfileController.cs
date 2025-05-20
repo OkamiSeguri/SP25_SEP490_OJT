@@ -186,21 +186,49 @@ namespace FOMSOData.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] StudentProfile studentProfile)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { code = 400, detail = "Invalid request data." });
             }
-            var exist = await studentProfileRepository.GetStudentProfileById(id);
+
+            var exist = await studentProfileRepository.GetStudentProfileByUserId(id);
             if (exist == null)
             {
                 return NotFound(new { code = 404, detail = "Student profile not found" });
             }
 
-            studentProfile.StudentId = id;
+            studentProfile.UserId = id;
+            studentProfile.StudentId = exist.StudentId;
+
+            // Lấy CurriculumId tương ứng từ Cohort
+            var cohortList = new List<string> { studentProfile.Cohort };
+            var cohortCurriculums = await cohortCurriculumRepository.GetCohortCurriculumByCohort(cohortList);
+
+            if (cohortCurriculums == null || cohortCurriculums.Count == 0)
+            {
+                return BadRequest(new { code = 400, detail = $"No curriculum found for cohort {studentProfile.Cohort}" });
+            }
+
+            studentProfile.CurriculumId = cohortCurriculums.First().CurriculumId;
+
+            await studentGradeRepository.DeleteByUserId(studentProfile.UserId); // Nếu bạn muốn giống thằng import
             await studentProfileRepository.Update(studentProfile);
+
+            // Thêm lại grade theo curriculum
+            var grades = cohortCurriculums.Select(cc => new StudentGrade
+            {
+                UserId = studentProfile.UserId,
+                CurriculumId = cc.CurriculumId,
+                Semester = cc.Semester,
+                Grade = 0,
+                IsPassed = 0
+            }).ToList();
+
+            await studentGradeRepository.CreateMultiple(grades);
+
             return Ok(new { result = studentProfile, status = 200 });
         }
+
 
 
         [HttpDelete("{id}")]
@@ -336,7 +364,6 @@ namespace FOMSOData.Controllers
                     });
                 }
 
-
                 var mssvList = records.Select(r => r.MSSV).Distinct().ToList();
                 var cohortList = records.Select(r => r.Cohort).Distinct().ToList();
 
@@ -354,6 +381,7 @@ namespace FOMSOData.Controllers
                 var studentGrades = new List<StudentGrade>();
                 var missingUserIds = new List<string>();
                 var missingCohorts = new List<string>();
+                var duplicateMSSVs = new List<string>();
 
                 foreach (var record in records)
                 {
@@ -369,10 +397,10 @@ namespace FOMSOData.Controllers
                         continue;
                     }
 
-                    if (existingProfilesDict.TryGetValue(user.UserId, out var existingProfile))
+                    if (existingProfilesDict.ContainsKey(user.UserId))
                     {
-                        await studentGradeRepository.DeleteByUserId(existingProfile.UserId);
-                        await studentProfileRepository.DeleteByUserId(existingProfile.UserId);
+                        duplicateMSSVs.Add(record.MSSV);
+                        continue; // bỏ qua MSSV trùng để check hết tất cả MSSV khác
                     }
 
                     var studentProfile = new StudentProfile
@@ -393,6 +421,15 @@ namespace FOMSOData.Controllers
                         Grade = 0,
                         IsPassed = 0
                     }));
+                }
+
+                if (duplicateMSSVs.Any())
+                {
+                    return BadRequest(new
+                    {
+                        message = "StudentProfile already exists for the following MSSVs:",
+                        duplicates = duplicateMSSVs.Distinct().ToList()
+                    });
                 }
 
                 if (missingUserIds.Count > 0 || missingCohorts.Count > 0)

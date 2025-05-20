@@ -11,6 +11,8 @@ namespace DataAccess
         {
             return await _context.StudentGrades
                 .Where(g => !g.User.IsDeleted && !g.User.StudentProfile.IsDeleted)
+                                .Include(g => g.Curriculum)
+
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -30,6 +32,7 @@ namespace DataAccess
 
             return await _context.StudentGrades
                 .Where(g => g.UserId == id)
+                .Include(g => g.Curriculum)
                 .AsNoTracking()
                 .ToListAsync();
         }

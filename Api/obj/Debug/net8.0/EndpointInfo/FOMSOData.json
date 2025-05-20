@@ -50,17 +50,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CohortCurriculum"
+                "$ref": "#/components/schemas/CohortCurriculumImportDTO"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CohortCurriculum"
+                "$ref": "#/components/schemas/CohortCurriculumImportDTO"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CohortCurriculum"
+                "$ref": "#/components/schemas/CohortCurriculumImportDTO"
               }
             }
           }
@@ -3198,6 +3198,24 @@
               "$ref": "#/components/schemas/StudentProfile"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CohortCurriculumImportDTO": {
+        "type": "object",
+        "properties": {
+          "cohort": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "semester": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

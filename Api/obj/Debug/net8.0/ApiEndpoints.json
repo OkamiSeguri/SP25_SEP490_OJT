@@ -46,8 +46,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "cohortCurriculum",
-        "Type": "BusinessObject.CohortCurriculum",
+        "Name": "dto",
+        "Type": "FOMSOData.Models.CohortCurriculumImportDTO",
         "IsRequired": true
       }
     ],

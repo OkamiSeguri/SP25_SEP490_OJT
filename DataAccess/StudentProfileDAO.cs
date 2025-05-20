@@ -25,7 +25,6 @@ namespace DataAccess
         {
             var studentProfile = await _context.StudentProfiles
                 .Where(sp => !sp.IsDeleted)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.StudentId == id);
 
             return studentProfile;
@@ -44,7 +43,6 @@ namespace DataAccess
         {
             var studentProfile = await _context.StudentProfiles
                 .Where(sp => !sp.IsDeleted)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.UserId == id);
 
             return studentProfile;
@@ -69,13 +67,35 @@ namespace DataAccess
 
         public async Task Update(StudentProfile studentProfile)
         {
-            var existingItem = await GetStudentProfileById(studentProfile.StudentId);
+            var curriculumId = await _context.CohortCurriculums
+                .Where(cc => cc.Cohort == studentProfile.Cohort)
+                .Select(cc => cc.CurriculumId)
+                .FirstOrDefaultAsync();
+
+            if (curriculumId == 0)
+            {
+                throw new Exception("Invalid Cohort. CurriculumId not found.");
+            }
+
+            studentProfile.CurriculumId = curriculumId;
+
+            var existingItem = await GetStudentProfileByUserId(studentProfile.UserId);
             if (existingItem != null)
             {
-                _context.Entry(existingItem).CurrentValues.SetValues(studentProfile);
+                _context.Entry(existingItem).State = EntityState.Detached;
+
+                existingItem.Cohort = studentProfile.Cohort;
+                existingItem.CurriculumId = studentProfile.CurriculumId;
+                existingItem.TotalCredits = studentProfile.TotalCredits;
+                existingItem.DebtCredits = studentProfile.DebtCredits;
+
+                _context.StudentProfiles.Attach(existingItem);
+                _context.Entry(existingItem).State = EntityState.Modified;
             }
+
             await _context.SaveChangesAsync();
         }
+
         public async Task Delete(int id)
         {
             var studentProfile = await GetStudentProfileById(id);

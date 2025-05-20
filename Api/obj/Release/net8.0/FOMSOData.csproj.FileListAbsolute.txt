@@ -313,3 +313,11 @@ E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\FOMSOData
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\staticwebassets.build.json.cache
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\staticwebassets.build.endpoints.json
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\staticwebassets.upToDateCheck.txt
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\ClosedXML.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\ClosedXML.Parser.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\DocumentFormat.OpenXml.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\DocumentFormat.OpenXml.Framework.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\ExcelNumberFormat.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\RBush.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\SixLabors.Fonts.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\bin\Release\net8.0\System.IO.Packaging.dll

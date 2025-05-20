@@ -10,8 +10,13 @@ E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Ou
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Azure.Core.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Azure.Identity.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\BouncyCastle.Cryptography.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\ClosedXML.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\ClosedXML.Parser.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\CloudinaryDotNet.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\CsvHelper.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\DocumentFormat.OpenXml.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\DocumentFormat.OpenXml.Framework.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\ExcelNumberFormat.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Google.Apis.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Google.Apis.Auth.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Google.Apis.Core.dll
@@ -102,6 +107,8 @@ E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Ou
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\NuGet.Protocol.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\NuGet.Versioning.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Pomelo.EntityFrameworkCore.MySql.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\RBush.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\SixLabors.Fonts.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -116,6 +123,7 @@ E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Ou
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\System.Diagnostics.DiagnosticSource.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\System.Formats.Asn1.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\System.IdentityModel.Tokens.Jwt.dll
+E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\System.IO.Packaging.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\System.IO.Pipelines.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\System.Management.dll
 E:\FPT\Đồ Án Tốt Nghiệp\SP25_SEP490_OJT\Api\obj\Release\net8.0\PubTmp\Out\System.Memory.Data.dll
